@@ -1,74 +1,91 @@
-# Varnish module - install, configure and manage VCL (Ubuntu/CentOS)
+## Varnish module - install, configure and manage VCL (Ubuntu/CentOS)
 
 This Puppet module installs and configures Varnish.
 It also allows to manage Varnish VCL.
 Tested on Ubuntu and CentOS.
 
-# Class varnish
+## Class varnish
 
 Installs Varnish. Provides access to all configuration parameters. Controls Varnish service.
+
 By default mounts shared memory log directory as tmpfs.
 
 All parameters are low case replica of actual parameters passed to
 the Varnish conf file, $class_parameter -> VARNISH_PARAMETER, i.e.
+
 $memlock             -> MEMLOCK
+
 $varnish_vcl_conf    -> VARNISH_VCL_CONF
+
 $varnish_listen_port -> VARNISH_LISTEN_PORT
 
 Exceptions are: 
+
 shmlog_dir    - location for shmlog 
+
 shmlog_tempfs - mounts shmlog directory as tmpfs
                 default value: true
+
 version       - passed to puppet type 'package', attribute 'ensure'
                 default value: present
 
 At minimum you may want to change a value for default port:
+
 varnish_listen_port => '80'
 
 For more details on parameters, check class varnish.
 
-# Usage, class varnish
+## Usage, class varnish
 
-installs Varnish
-allocates for cache 1GB (malloc) 
-starts it on port 80:
+Installs Varnish, allocates for cache 1GB (malloc) and starts it on port 80:
 
     class {'varnish':
       varnish_listen_port => 80,
       varnish_storage_size => '1G',
     }
 
-# Class varnish::vcl
+## Class varnish::vcl
 
 Manages Varnish VCL configuration.
+
 In most cases Varnish default configuration will run just fine.
 The only thing to configure are backends, directors and probes.
 
 VCL applies following restictions:
+
 if you define a probe it must be used
+
 if you define a backend it must be used
+
 if you define a director it must be used
 
 varnish::vcl accepts following parameters:
-probes
-backends
-directors
-selectors
-conditions
-template
+
+    probes
+    backends
+    directors
+    selectors
+    conditions
+    template
 
 While probes, backends and directors are self-explanatory and template is guessable 
+
 WTF are selectors and conditions?
 
 You cannot define 2 or more backends/directors and not to use them.
 This will result in VCL compilation failure.
+
 Parameter 'selectors' gives access to req.backend inside vcl_recv.
+
 Code:
+
     selectors => [
       { backend => 'cluster2', condition => 'req.url ~ "^/cluster2"' },
       { backend => 'cluster1' },
     ],
+
 Will result in following VCL configuration to be generated:
+
     if (req.url ~ "^/cluster2") {
       set req.backend = cluster2;
     } else {
@@ -79,15 +96,16 @@ conditions - TODO.
 
 If modification to Varnish VCL goes further than configuring probes, backends and directors
 parameter 'template' can be used to point varnish::vcl class at a different template.
+
 NOTE: If you copy existing template and modify it you will still 
 be able to use probes, backends, directors and selectors parameters.
 
-# Usage, class varnish::vcl
+## Usage, class varnish::vcl
 
 Simple setup:
-1 probe 
-2 backends 
-1 director
+
+1 probe, 2 backends and 1 director
+
     class { 'varnish::vcl':
       probes => [
         { name => 'health_check', url => "/health_check" },
@@ -106,10 +124,8 @@ Simple setup:
 
 
 Slightly more complex setup:
-2 probes
-8 backends
-2 directors
-traffic for URL /cluster2 goes to second director 'cluster2'
+
+2 probes, 8 backends, 2 directors and traffic for URL /cluster2 goes to second director 'cluster2'
 
     class { 'varnish::vcl':
       probes => [
