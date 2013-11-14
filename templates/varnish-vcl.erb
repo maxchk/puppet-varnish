@@ -13,9 +13,9 @@
 
 # set probe(s)
 #
-<% probes.each do |probe| -%>
+<% @probes.each do |probe| -%>
 probe <%= probe['name'] -%> {
-  <%- probe_params.each do |param| -%>
+  <%- @probe_params.each do |param| -%>
     <%- next unless probe[param] -%>
     <%- if param == 'url' -%>
   .<%= param -%> = "<%= probe[param] -%>";
@@ -37,7 +37,7 @@ probe <%= probe['name'] -%> {
 
 # set backends
 # 
-<% backends.each do |backend| -%>
+<% @backends.each do |backend| -%>
 backend <%= backend['name'] -%> {
   .host = "<%= backend['host'] -%>";
   .port = "<%= backend['port'] -%>";
@@ -47,7 +47,7 @@ backend <%= backend['name'] -%> {
 
 # set directors
 #
-<% directors.each do |director| -%>
+<% @directors.each do |director| -%>
 director <%= director['name'] -%> round-robin {
   <%- director['backends'].each do |backend| -%>
   { .backend = <%= backend -%>; }
@@ -71,10 +71,10 @@ sub vcl_recv {
 
   # backend selection
   #
-<%- if selectors.size == 1 -%>  
+<%- if @selectors.size == 1 -%>  
   set req.backend = <%= selectors[0]['backend'] -%>;
 <%- else -%>
-  <%- selectors.each do |selector| -%>
+  <%- @selectors.each do |selector| -%>
     <%- if selectors[0] == selector -%>
   if (<%= selector['condition'] -%>) {
     set req.backend = <%= selector['backend'] -%>;
