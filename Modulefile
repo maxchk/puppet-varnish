@@ -1,5 +1,5 @@
 name 'maxchk-varnish'
-version '0.0.1'
+version '0.0.2'
 author 'Max Horlanchuk <max.horlanchuk@gmail.com>'
 license 'Apache'
 summary 'Varnish module'
