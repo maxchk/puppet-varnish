@@ -73,18 +73,30 @@ sub vcl_recv {
   #
 <%- if @selectors.size == 1 -%>  
   set req.backend = <%= selectors[0]['backend'] -%>;
+  <%- if selectors[0]['newurl'] -%>
+  set req.url = <%= selectors[0]['newurl'] %>
+  <% end -%>
 <%- else -%>
   <%- @selectors.each do |selector| -%>
     <%- if selectors[0] == selector -%>
   if (<%= selector['condition'] -%>) {
     set req.backend = <%= selector['backend'] -%>;
+      <%- if selector['newurl'] -%>
+    set req.url = <%= selector['newurl'] -%>;
+      <% end -%>
     <%- elsif selectors[-1] == selector -%>
   } else {
     set req.backend = <%= selector['backend'] -%>;
+      <%- if selector['newurl'] -%>
+    set req.url = <%= selector['newurl'] -%>;
+      <%- end -%>
   }
     <%- else -%>
   } elsif (<%= selector['condition'] -%>) {
     set req.backend = <%= selector['backend'] -%>;
+      <%- if selector['newurl'] -%>
+    set req.url = <%= selector['newurl'] -%>;
+      <% end -%>
     <%- end -%>
   <%- end -%>
 <%- end -%>
