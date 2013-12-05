@@ -51,6 +51,7 @@ For more details on parameters, check class varnish.
    if you define a director it must be used  
 
    varnish::vcl accepts following parameters:  
+   `acls`  
    `probes`  
    `backends`  
    `directors`  
@@ -58,7 +59,7 @@ For more details on parameters, check class varnish.
    `conditions`  
    `template`  
 
-   While `probes`, `backends` and `directors` are self-explanatory and `template` is guessable  
+   While `acls`, `probes`, `backends` and `directors` are self-explanatory and `template` is guessable  
    WTF are `selectors` and `conditions`?  
 
    You cannot define 2 or more backends/directors and not to use them.  
