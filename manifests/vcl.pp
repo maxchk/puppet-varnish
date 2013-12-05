@@ -26,6 +26,12 @@
 #                { name => 'director2', type => 'round-robin', backends => [ 'srv3', 'srv4' ] },
 #              ]
 #
+# acls       - list of acls to configure, must be an array of hashes
+#              [
+#                { name => 'acl1', hosts => [ '"localhost"', '"10.0.0.0"/24', '! "10.0.0.1"' ] },
+#                { name => 'acl2', hosts => [ '"localhost"', '"10.1.0.0"/24', '! "10.1.0.1"' ] },
+#              ]
+#
 # selectors  - list of selectors, configured only when multiple backends/directors are in use, must be an array
 #              will be configured in the same order as listed in manifest
 #
@@ -96,6 +102,7 @@ class varnish::vcl (
   $probes     = [],
   $backends   = [ { name => 'default', host => '127.0.0.1', port => '8080' } ],
   $directors  = [],
+  $acls       = [],
   $selectors  = [],
   $conditions = [],
   $template   = undef,
