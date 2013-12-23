@@ -130,5 +130,6 @@ class varnish::vcl (
     mode    => '0644',
     content => template($template_vcl),
     notify  => Service['varnish'],
+    require => Package['varnish'],
   }
 }
