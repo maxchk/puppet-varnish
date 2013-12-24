@@ -83,10 +83,10 @@ sub vcl_recv {
   set req.backend = <%= @selectors[0]['backend'] -%>;
 <%- else -%>
   <%- @selectors.each do |selector| -%>
-    <%- if selectors[0] == selector -%>
+    <%- if @selectors[0] == selector -%>
   if (<%= selector['condition'] -%>) {
     set req.backend = <%= selector['backend'] -%>;
-    <%- elsif selectors[-1] == selector -%>
+    <%- elsif @selectors[-1] == selector -%>
   } else {
     set req.backend = <%= selector['backend'] -%>;
   }
