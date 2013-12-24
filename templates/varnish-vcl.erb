@@ -80,7 +80,7 @@ sub vcl_recv {
   # backend selection
   #
 <%- if @selectors.size == 1 -%>  
-  set req.backend = <%= selectors[0]['backend'] -%>;
+  set req.backend = <%= @selectors[0]['backend'] -%>;
 <%- else -%>
   <%- @selectors.each do |selector| -%>
     <%- if selectors[0] == selector -%>
