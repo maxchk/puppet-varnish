@@ -2,7 +2,7 @@
 
    This Puppet module installs and configures Varnish.  
    It also allows to manage Varnish VCL.  
-   Tested on Ubuntu and CentOS.  
+   Tested on Ubuntu, CentOS, RHEL and Oracle Linux.
 
 ## Class varnish
 
