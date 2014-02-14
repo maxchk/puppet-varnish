@@ -88,17 +88,31 @@
 #  selectors => [
 #    { backend => 'cluster2', condition => 'req.url ~ "^/cluster2"' },
 #    { backend => 'cluster2' },
-# ],
+#  ],
+#  acls => [
+#    { name => 'acl1', hosts => [ '"localhost"', '"10.0.0.0"/8' ] },
+#  ],
 # }
 #
 
 class varnish::vcl (
-  $probes     = [],
-  $backends   = [ { name => 'default', host => '127.0.0.1', port => '8080' } ],
-  $directors  = [],
-  $selectors  = [],
-  $conditions = [],
-  $template   = undef,
+  $probes            = [],
+  $backends          = [ { name => 'default', host => '127.0.0.1', port => '8080' } ],
+  $directors         = [],
+  $selectors         = [],
+  $conditions        = [],
+  $acls              = [],
+  $blockedips	     = [],
+  $blockedbots	     = [],
+  $wafexceptions     = [ "57" , "56" , "34" ],
+  $purgeips          = [], 
+  $includedir        = "/etc/varnish/includes",
+  $cookiekeeps       = [ '__ac', '_ZopeId', 'captchasessionid', 'statusmessages', '__cp', 'MoodleSession'],
+  $defaultgrace      = undef,
+  $min_cache_time    = "60s",
+  $static_cache_time = "5m",
+  $gziptypes         = [ 'text/', 'application/xml', 'application/rss', 'application/xhtml', 'application/javascript', 'application/x-javascript' ],
+  $template          = undef,
 ) {
 
   include varnish
@@ -106,13 +120,34 @@ class varnish::vcl (
   # parameters for probe
   $probe_params = [ 'interval', 'timeout', 'threshold', 'window', 'url', 'request' ]
 
+  # define include file type
+  define includefile {
+    $selectors = $varnish::vcl::selectors
+    file { "${varnish::vcl::includedir}/$title.vcl":
+       owner   => 'root',
+       group   => 'root',
+       mode    => '0444',
+       content => template("varnish/includes/$title.vcl.erb"),
+       notify  => Service['varnish'],
+       require => File["${varnish::vcl::includedir}"],
+    }
+  }
+
+
   # select template to use
   if $template {
     $template_vcl = $template
   }
   else {
     $template_vcl = 'varnish/varnish-vcl.erb'
+    file { "$includedir":
+	ensure => directory,	
+    }
+    $includefiles = ["probes", "backends", "directors", "acls", "backendselection", "waf"]
+    includefile { $includefiles: }
   }
+
+  
 
   # vcl file
   file { 'varnish-vcl':
