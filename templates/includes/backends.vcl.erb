@@ -1,0 +1,11 @@
+# File managed by Puppet
+# set backends
+#
+<% @backends.each do |backend| -%>
+backend <%= backend['name'] -%> {
+  .host = "<%= backend['host'] -%>";
+  .port = "<%= backend['port'] -%>";
+  <%- if backend['probe'] -%>  .probe = <%= backend['probe'] -%>; <%- end %>
+}
+<%- end -%>
+

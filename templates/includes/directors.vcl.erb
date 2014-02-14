@@ -1,0 +1,11 @@
+# File managed by Puppet
+# set directors
+#
+<% @directors.each do |director| -%>
+director <%= director['name'] -%> round-robin {
+  <%- director['backends'].each do |backend| -%>
+  { .backend = <%= backend -%>; }
+  <%- end -%>
+}
+<%- end -%>
+

@@ -1,0 +1,23 @@
+# File managed by Puppet
+# acl definitions
+<% @acls.each do |acl| -%>
+acl <%= acl['name'] -%> {
+  <%- acl['hosts'].each do |host| -%>
+  <%= host -%>;
+  <%- end -%>
+}
+<%- end -%>
+
+# blocked IPs
+acl blockedips {
+  <%- @blockedips.each do |ip| -%>
+  <%= ip -%>;
+  <%- end -%>
+}
+
+# IPs allowed to PURGE Cache
+acl purge {
+  <%- @purgeips.each do |ip| -%>
+  <%= ip -%>;
+  <%- end -%>
+}

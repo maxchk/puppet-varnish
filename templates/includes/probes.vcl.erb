@@ -1,0 +1,25 @@
+# File managed by Puppet
+# set probe(s)
+#
+<% @probes.each do |probe| -%>
+probe <%= probe['name'] -%> {
+  <%- @probe_params.each do |param| -%>
+    <%- next unless probe[param] -%>
+    <%- if param == 'url' -%>
+  .<%= param -%> = "<%= probe[param] -%>";
+    <%- elsif param == 'request' -%>
+  .<%= param -%> =
+      <%- probe['request'].each do |req_str| -%>
+        <%- if req_str == probe['request'][-1] -%>
+             "<%= req_str -%>";
+        <%- else -%>
+             "<%= req_str -%>"
+        <%- end -%>
+       <%- end -%>
+    <%- else -%>
+  .<%= param -%> = <%= probe[param] -%>;
+    <%- end -%>
+  <%- end -%>
+}
+<%- end -%>
+

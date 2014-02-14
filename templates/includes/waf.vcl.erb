@@ -1,0 +1,372 @@
+        # VARNISH FIREWALL RULES : SQL XSS PATH FILE CMD GENERIC PHP
+
+
+        #SQL INJECTION
+        if (req.url ~ "(?i).+SELECT.+FROM")
+        {
+          if (!(req.http.EXCE ~ ";1;")){set req.http.RULE = req.http.RULE + ";1;";}
+        }
+        if (req.url ~ "(?i).+UNION\s+SELECT")
+        {
+          if (!(req.http.EXCE ~ ";2;")){set req.http.RULE = req.http.RULE + ";2;";}
+        }
+
+        if (req.url ~ "(?i).+UPDATE.+SET")
+        {
+          if (!(req.http.EXCE ~ ";3;")){set req.http.RULE = req.http.RULE + ";3;";}
+        }
+
+        if (req.url ~ "(?i).+INSERT.+INTO")
+        {
+          if (!(req.http.EXCE ~ ";4;")){set req.http.RULE = req.http.RULE + ";4;";}
+        }
+
+        if (req.url ~ "(?i).+DELETE.+FROM")
+        {
+          if (!(req.http.EXCE ~ ";5;")){set req.http.RULE = req.http.RULE + ";5;";}
+        }
+
+        if (req.url ~ "(?i).+ASCII\(.+SELECT")
+        {
+          if (!(req.http.EXCE ~ ";6;")){set req.http.RULE = req.http.RULE + ";6;";}
+        }
+
+        if (req.url ~ "(?i).+DROP.+TABLE")
+        {
+          if (!(req.http.EXCE ~ ";7;")){set req.http.RULE = req.http.RULE + ";7;";}
+        }
+
+        if (req.url ~ "(?i).+DROP.+DATABASE")
+        {
+          if (!(req.http.EXCE ~ ";8;")){set req.http.RULE = req.http.RULE + ";8;";}
+        }
+
+        if (req.url ~ "(?i).+SELECT.+VERSION")
+        {
+          if (!(req.http.EXCE ~ ";9;")){set req.http.RULE = req.http.RULE + ";9;";}
+        }
+
+        if (req.url ~ "(?i).+SHOW.+CUR(DATE|TIME)")
+        {
+          if (!(req.http.EXCE ~ ";10;")){set req.http.RULE = req.http.RULE + ";10;";}
+        }
+
+        if (req.url ~ "(?i).+SELECT.+SUBSTR")
+        {
+          if (!(req.http.EXCE ~ ";11;")){set req.http.RULE = req.http.RULE + ";11;";}
+        }
+
+        if (req.url ~ "(?i).+SELECT.+INSTR")
+        {
+          if (!(req.http.EXCE ~ ";12;")){set req.http.RULE = req.http.RULE + ";12;";}
+        }
+
+        if (req.url ~ "(?i).+SHOW.+CHARACTER.+SET")
+        {
+          if (!(req.http.EXCE ~ ";13;")){set req.http.RULE = req.http.RULE + ";13;";}
+        }
+
+        if (req.url ~ "(?i).+BULK.+INSERT")
+        {
+          if (!(req.http.EXCE ~ ";14;")){set req.http.RULE = req.http.RULE + ";14;";}
+        }
+
+        if (req.url ~ "(?i).+INSERT.+VALUES")
+        {
+          if (!(req.http.EXCE ~ ";15;")){set req.http.RULE = req.http.RULE + ";15;";}
+        }
+
+        if (req.url ~ "(?i).+\%2F\%2A.+\%2A\%2F")
+        {
+          if (!(req.http.EXCE ~ ";16;")){set req.http.RULE = req.http.RULE + ";16;";}
+        }
+
+        if (req.url ~ "(?i).+SELECT.+CONCAT")
+        {
+          if (!(req.http.EXCE ~ ";17;")){set req.http.RULE = req.http.RULE + ";17;";}
+        }
+        #END SQL INJECTION
+        
+        
+
+
+
+
+
+
+        #COMANDS INJECTION
+        if (req.url ~ "(=|;|&&|%7C%7C)wget.+") 
+        {
+          if (!(req.http.EXCE ~ ";18;")){set req.http.RULE = req.http.RULE + ";18;";}
+        }
+
+        if (req.url ~ "(=|;|&&|%7C%7C)curl.+") 
+        {
+          if (!(req.http.EXCE ~ ";19;")){set req.http.RULE = req.http.RULE + ";19;";}
+        }
+
+        if (req.url ~ "(=|;|&&|%7C%7C)echo.+") 
+        {
+          if (!(req.http.EXCE ~ ";20;")){set req.http.RULE = req.http.RULE + ";20;";}
+        }
+
+        if (req.url ~ "(=|;|&&|%7C%7C)cat\ .+") 
+        {
+          if (!(req.http.EXCE ~ ";21;")){set req.http.RULE = req.http.RULE + ";21;";}
+        }
+
+        if (req.url ~ "(=|;|&&|%7C%7C)cmd.exe.+") 
+        {
+          if (!(req.http.EXCE ~ ";22;")){set req.http.RULE = req.http.RULE + ";22;";}
+        }
+
+        if (req.url ~ "(=|;|&&)nc(.exe)?.+(\-(l|p)?)?") 
+        {
+          if (!(req.http.EXCE ~ ";23;")){set req.http.RULE = req.http.RULE + ";23;";}
+        }
+
+        if (req.url ~ "(=|;|&&)(whoami|who|uptime|last).*") 
+        {
+          if (!(req.http.EXCE ~ ";24;")){set req.http.RULE = req.http.RULE + ";24;";}
+        }
+
+        if (req.url ~ "(>|%3E|-o)+" && req.url ~ "/dev/null") 
+        {
+          if (!(req.http.EXCE ~ ";25;")){set req.http.RULE = req.http.RULE + ";25;";}
+        }
+        #END COMANDS INJECTION
+
+
+
+
+
+        #CROSS SITE SCRIPT
+        if (req.url ~ "(<|\%3C)?(java|vb)?script(>|\%3E).*(<|\%3C).*\/script(>|\%3E)?") 
+        {
+          if (!(req.http.EXCE ~ ";26;")){set req.http.RULE = req.http.RULE + ";26;";}
+        }
+
+        # Checks if someone tries to inject java/vb script for XSS in URL
+        if (req.url ~ "(java|vb)?script:") 
+        {
+          if (!(req.http.EXCE ~ ";27;")){set req.http.RULE = req.http.RULE + ";27;";}
+        }
+
+        # Checks if someone tries to inject java/vb script for XSS in URL
+        if (req.url ~ "\(.*javascript.*\)") 
+        {
+          if (!(req.http.EXCE ~ ";28;")){set req.http.RULE = req.http.RULE + ";28;";}
+        }
+
+        # Checks if someone tries to inject java/vb script for XSS in URL
+        if (req.url ~ "\(.*vbscript.*\)") 
+        {
+          if (!(req.http.EXCE ~ ";29;")){set req.http.RULE = req.http.RULE + ";29;";}
+        }
+
+        # Checks if someone tries to inject java/vb script for XSS in URL
+        if (req.url ~ ":?.*url\(") 
+        {
+          if (!(req.http.EXCE ~ ";30;")){set req.http.RULE = req.http.RULE + ";30;";}
+        } 
+	#END CROSS SITE SCRIPT 
+
+
+
+
+
+        #JAVA INJECTION
+        if (req.url ~ "(?i)allowStaticMethodAccess|getRuntime|MethodAccess|memberAccess|session\[")
+        {
+          if (!(req.http.EXCE ~ ";31;")){set req.http.RULE = req.http.RULE + ";31;";}
+        }
+        if (req.url ~ "(?i)java.io|struts2|inputstream|outputstream|getrealpath")
+        {
+          if (!(req.http.EXCE ~ ";32;")){set req.http.RULE = req.http.RULE + ";32;";}
+        }
+	#END JAVA INJECTION
+        
+
+
+        # SSI INJECTION
+  	if (req.url ~ "(?i)(<|%3C|)(\s|%20|\t|%09|\+)*(!|%21)--(\s|%20|\t|%09|\+)*(#|%23)(\s|%20|\t|%09|\+)*(e(cho|xec)|printenv|include|cmd)") 
+        {
+          if (!(req.http.EXCE ~ ";33;")){set req.http.RULE = req.http.RULE + ";33;";}
+	}
+        # END SSI INJECTION
+
+
+
+
+        # PATH INJECTION
+	if (req.url ~ "(?i)((/|\\)\.{2}|\.{2}(/|\\))") 
+        {
+          if (!(req.http.EXCE ~ ";34;")){set req.http.RULE = req.http.RULE + ";34;";}
+	}
+
+	if (req.url ~ "(?i)\.(htaccess|htpasswd)") 
+        {
+          if (!(req.http.EXCE ~ ";35;")){set req.http.RULE = req.http.RULE + ";35;";}
+	}
+
+	if (req.url ~ "(?i)\.(cvs|svn|git|hg)") 
+        {
+          if (!(req.http.EXCE ~ ";36;")){set req.http.RULE = req.http.RULE + ";36;";}
+	}
+
+	if (req.url ~ "(?i)\.(sql|sqlite|mdb)") 
+        {
+          if (!(req.http.EXCE ~ ";37;")){set req.http.RULE = req.http.RULE + ";37;";}
+	}
+
+	if (req.url ~ "(?i)(\.((bash_)?history|(vim|bash)rc|ssh)|authorized_keys)") 
+        {
+          if (!(req.http.EXCE ~ ";38;")){set req.http.RULE = req.http.RULE + ";38;";}
+	}
+
+	if (req.url ~ "(?i)[a-z]\:\\") 
+        {
+          if (!(req.http.EXCE ~ ";39;")){set req.http.RULE = req.http.RULE + ";39;";}
+	}
+
+	if (req.url ~ "(?i)((cmd(32)?|net|telnet|wsh|ftp|nmap)\.exe$|\.(db|bat|reg|asa)$)") 
+        {
+          if (!(req.http.EXCE ~ ";40;")){set req.http.RULE = req.http.RULE + ";40;";}
+	}
+
+	if (req.url ~ "(?i)\.(ini|scr)") 
+        {
+          if (!(req.http.EXCE ~ ";41;")){set req.http.RULE = req.http.RULE + ";41;";}
+	}
+        #END PATH INJECTION
+
+
+
+
+
+
+        # PHP ATTACKS
+        if (req.url ~ "GLOBALS\[") 
+        {
+          if (!(req.http.EXCE ~ ";42;")){set req.http.RULE = req.http.RULE + ";42;";}
+        }
+
+        if (req.url ~ "_SERVER\[") 
+        {
+          if (!(req.http.EXCE ~ ";43;")){set req.http.RULE = req.http.RULE + ";43;";}
+        }
+
+        if (req.url ~ "_GET\[") 
+        {
+          if (!(req.http.EXCE ~ ";44;")){set req.http.RULE = req.http.RULE + ";44;";}
+        }
+
+        if (req.url ~ "_POST\[") 
+        {
+          if (!(req.http.EXCE ~ ";45;")){set req.http.RULE = req.http.RULE + ";45;";}
+        }
+
+        if (req.url ~ "_FILES\[") 
+        {
+          if (!(req.http.EXCE ~ ";46;")){set req.http.RULE = req.http.RULE + ";46;";}
+        }
+ 
+        if (req.url ~ "_REQUEST\[")
+        { 
+          if (!(req.http.EXCE ~ ";47;")){set req.http.RULE = req.http.RULE + ";47;";}
+        }
+ 
+        if (req.url ~ "_SESSION\[") 
+        {
+          if (!(req.http.EXCE ~ ";48;")){set req.http.RULE = req.http.RULE + ";48;";}
+        }
+
+        if (req.url ~ "_ENV\[") 
+        {
+          if (!(req.http.EXCE ~ ";49;")){set req.http.RULE = req.http.RULE + ";49;";}
+        }
+
+        if (req.url ~ "_COOKIE\[") 
+        {
+          if (!(req.http.EXCE ~ ";50;")){set req.http.RULE = req.http.RULE + ";50;";}
+        }
+
+        if (req.url ~ "_REQUEST\[") 
+        {
+          if (!(req.http.EXCE ~ ";51;")){set req.http.RULE = req.http.RULE + ";51;";}
+        }
+
+        if (req.url ~ "_PHPLIB\[") 
+        {
+          if (!(req.http.EXCE ~ ";52;")){set req.http.RULE = req.http.RULE + ";52;";}
+        }
+
+        if (req.url ~ "system\(") 
+        {
+          if (!(req.http.EXCE ~ ";53;")){set req.http.RULE = req.http.RULE + ";53;";}
+        }
+
+        if (req.url ~ "passthru\(") 
+        {
+          if (!(req.http.EXCE ~ ";54;")){set req.http.RULE = req.http.RULE + ";54;";}
+        }
+
+        if (req.url ~ "eval\(") 
+        {
+          if (!(req.http.EXCE ~ ";55;")){set req.http.RULE = req.http.RULE + ";55;";}
+        }
+
+        if (req.url ~ "(<|\%3C)\?(php).*\?(>|\%3E)") 
+        {
+          if (!(req.http.EXCE ~ ";56;")){set req.http.RULE = req.http.RULE + ";56;";}
+        }
+
+        if (req.url ~ "=?(https?|ftps?|php)://") 
+        {
+          if (!(req.http.EXCE ~ ";57;")){set req.http.RULE = req.http.RULE + ";57;";}
+        }
+        # END PHP ATTACKS
+
+
+
+
+
+
+
+ 
+        #FILE INJECTION
+        if (req.url ~ "/etc/(passwd(\-)?|(g)?shadow(\-)?|motd|group(\-)?)") 
+        {
+          if (!(req.http.EXCE ~ ";58;")){set req.http.RULE = req.http.RULE + ";58;";}
+        }
+
+        # Checks if someone tries to access common dirs in /etc/ dir
+        if (req.url ~ "/etc/(apache(2)?|httpd|phpmyadmin|mysql|php(4|5)?)/") 
+        {
+          if (!(req.http.EXCE ~ ";59;")){set req.http.RULE = req.http.RULE + ";59;";}
+        }
+
+        # Checks if someone tries to access /tmp/ dir
+        if (req.url ~ "/tmp/") 
+        {
+          if (!(req.http.EXCE ~ ";60;")){set req.http.RULE = req.http.RULE + ";60;";}
+        }
+
+        # Checks if someone tries to access common dirs in /var/ dir
+        if (req.url ~ "/var/(log|backups|mail|www)/") 
+        {
+          if (!(req.http.EXCE ~ ";61;")){set req.http.RULE = req.http.RULE + ";61;";}
+        }
+
+        # Checks if someone tries to access common files from /proc/ dir
+        if (req.url ~ "/proc/(self/environ|cmdline|cpuinfo|mounts|mdstat|partitions|version(_signature)?|uptime)") 
+        {
+          if (!(req.http.EXCE ~ ";62;")){set req.http.RULE = req.http.RULE + ";62;";}
+        }
+
+        # Checks if someone tries a directory traversal
+        if (req.url ~ "\.(\.)?/\.(\.)?/\.(\.)?") 
+        {
+          if (!(req.http.EXCE ~ ";63;")){set req.http.RULE = req.http.RULE + ";63;";}
+        } 
+        #END FILE INJECTION 
