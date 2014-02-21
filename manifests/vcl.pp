@@ -5,29 +5,29 @@
 # === Parameters
 #
 # probes     - list of probes to configure, must be an array of hashes:
-#              [
-#                { name => 'probe1', url = '/healthcheck1' },
-#                { name => 'probe2', url = '/healthcheck2' },
-#              ]
-#              after 'name' you can provide any Varnish .probe parameters
+#              {
+#                probe1 => { url = '/healthcheck1' },
+#                probe2 => { url = '/healthcheck2' },
+#              }
+#              you can provide any Varnish .probe parameters
 #              just drop the . and use key => val syntax:
 #              timeout => '5s', window => '8', and so on
 #
-# backends   - list of backends to configure, must be an array of hashes
-#              [
-#                { name => 'srv1', host => '10.0.0.1', port => '80' },
-#                { name => 'srv2', host => '10.0.0.2', port => '80' },
-#              ]
-#              after 'name' you can provide any Varnish .backend parameters in the same way as for probes
+# backends   - list of backends to configure, must be a hash
+#              {
+#                'srv1' => { host => '10.0.0.1', port => '80' },
+#                'srv2' => { host => '10.0.0.2', port => '80' },
+#              }
+#              you can provide any Varnish .backend parameters in the same way as for probes
 #
 # directors  - list of directors to configure, must be an array of hashes
-#              [
-#                { name => 'director1', type => 'round-robin', backends => [ 'srv1', 'srv2' ] },
-#                { name => 'director2', type => 'round-robin', backends => [ 'srv3', 'srv4' ] },
-#              ]
+#              {
+#                director1 => { type => 'round-robin', backends => [ 'srv1', 'srv2' ] },
+#                director2 => { type => 'round-robin', backends => [ 'srv3', 'srv4' ] },
+#              }
 #
-# selectors  - list of selectors, configured only when multiple backends/directors are in use, must be an array
-#              will be configured in the same order as listed in manifest
+# selectors  - list of selectors, configured only when multiple backends/directors are in use
+#              will be configured in the same order as listed in manifest. Must be a Hash
 #
 # conditions - list of conditions to apply, must be an array of hashes
 #
@@ -96,12 +96,12 @@
 #
 
 class varnish::vcl (
-  $probes            = [],
-  $backends          = [ { name => 'default', host => '127.0.0.1', port => '8080' } ],
+  $probes            = {},
+  $backends          = { 'default' => { host => '127.0.0.1', port => '8080' } },
   $directors         = [],
   $selectors         = [],
   $conditions        = [],
-  $acls              = [],
+  $acls              = {},
   $blockedips	     = [],
   $blockedbots	     = [],
   $wafexceptions     = [ "57" , "56" , "34" ],
@@ -123,13 +123,19 @@ class varnish::vcl (
   # define include file type
   define includefile {
     $selectors = $varnish::vcl::selectors
-    file { "${varnish::vcl::includedir}/$title.vcl":
-       owner   => 'root',
-       group   => 'root',
-       mode    => '0444',
-       content => template("varnish/includes/$title.vcl.erb"),
-       notify  => Service['varnish'],
-       require => File["${varnish::vcl::includedir}"],
+    concat { "${varnish::vcl::includedir}/$title.vcl":
+       owner          => 'root',
+       group          => 'root',
+       mode           => '0444',
+       notify         => Service['varnish'],
+       require        => File["${varnish::vcl::includedir}"],
+    }
+
+    concat::fragment { "$title-header":
+       target => "${varnish::vcl::includedir}/$title.vcl",
+       content => '# File managed by Puppet
+',
+       order => '01',
     }
   }
 
@@ -159,4 +165,50 @@ class varnish::vcl (
     content => template($template_vcl),
     notify  => Service['varnish'],
   }
+
+  # web application firewall
+  concat::fragment { "waf":
+    target => "${varnish::vcl::includedir}/waf.vcl",
+    content => template('varnish/includes/waf.vcl.erb'),
+    order => '02',
+  }
+
+
+  #Create resources
+ 
+  #Backends
+  validate_hash($backends)
+  create_resources(varnish::backend,$backends) 
+
+  #Probes
+  validate_hash($probes)
+  create_resources(varnish::probe,$probes) 
+  
+  #Directors
+  validate_hash($directors)
+  create_resources(varnish::director,$directors)
+
+  #Selectors
+  validate_hash($selectors)
+  concat::fragment { "selectors-header":
+    target => "${varnish::vcl::includedir}/backendselection.vcl",
+    content => 'if ( false ) { 
+',
+    order => '02',
+  }
+  create_resources(varnish::selector,$selectors)
+  concat::fragment { "selectors-footer":
+    target => "${varnish::vcl::includedir}/backendselection.vcl",
+    content => '} else { error 403 "Access denied"; }',
+    order => '99',
+  }
+
+  #ACLs
+  validate_hash($acls)
+  $default_acls = { 
+    blockedips => { hosts => $blockedips },
+    purge => { hosts => $purgeips },
+  } 
+  $all_acls = merge($default_acls, $acls)
+  create_resources(varnish::acl,$all_acls) 
 }

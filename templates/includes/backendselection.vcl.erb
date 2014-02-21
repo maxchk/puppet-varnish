@@ -1,23 +1,5 @@
-# File managed by Puppet
-# backend selection
-
-<%- @selectors.each do |selector| -%>
-  <%- if selectors[0] == selector -%>
-if (<%= selector['condition'] -%>) {
-  set req.backend = <%= selector['backend'] -%>;
-    <%- if selector['newurl'] -%>
-  set req.url = <%= selector['newurl'] -%>;
-    <% end -%>
-  <%- else -%>
-} elsif (<%= selector['condition'] -%>) {
-  set req.backend = <%= selector['backend'] -%>;
-    <%- if selector['newurl'] -%>
-  set req.url = <%= selector['newurl'] -%>;
+} elsif (<%= @condition -%>) {
+  set req.backend = <%= @title -%>;
+    <%- if @newurl -%>
+  set req.url = <%= @newurl -%>;
     <%- end -%>
-  <%- end -%>
-  <%- if selectors[-1] == selector -%>
-} else {
-  error 403 "Access denied";
-}
-  <%- end -%>
-<%- end -%>
