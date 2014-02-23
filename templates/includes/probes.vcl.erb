@@ -1,0 +1,21 @@
+# set probe <%= @title %>
+probe <%= @title -%> {
+  <%- @probe_params.each do |param| -%>
+    <%- next unless instance_variable_get("@#{param}") -%>
+    <%- if param == 'url' -%>
+  .<%= param -%> = "<%= instance_variable_get("@#{param}") -%>";
+    <%- elsif param == 'request' -%>
+  .<%= param -%> =
+      <%- @request.each do |req_str| -%>
+        <%- if req_str == @request[-1] -%>
+             "<%= req_str -%>";
+        <%- else -%>
+             "<%= req_str -%>"
+        <%- end -%>
+       <%- end -%>
+    <%- else -%>
+  .<%= param -%> = <%= instance_variable_get("@#{param}") -%>;
+    <%- end -%>
+  <%- end -%>
+}
+

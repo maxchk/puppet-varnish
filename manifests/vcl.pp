@@ -5,26 +5,26 @@
 # === Parameters
 #
 # probes     - list of probes to configure, must be an array of hashes:
-#              [
-#                { name => 'probe1', url = '/healthcheck1' },
-#                { name => 'probe2', url = '/healthcheck2' },
-#              ]
-#              after 'name' you can provide any Varnish .probe parameters
+#              {
+#                probe1 => { url = '/healthcheck1' },
+#                probe2 => { url = '/healthcheck2' },
+#              }
+#              you can provide any Varnish .probe parameters
 #              just drop the . and use key => val syntax:
 #              timeout => '5s', window => '8', and so on
 #
-# backends   - list of backends to configure, must be an array of hashes
-#              [
-#                { name => 'srv1', host => '10.0.0.1', port => '80' },
-#                { name => 'srv2', host => '10.0.0.2', port => '80' },
-#              ]
-#              after 'name' you can provide any Varnish .backend parameters in the same way as for probes
+# backends   - list of backends to configure, must be a hash
+#              {
+#                'srv1' => { host => '10.0.0.1', port => '80' },
+#                'srv2' => { host => '10.0.0.2', port => '80' },
+#              }
+#              you can provide any Varnish .backend parameters in the same way as for probes
 #
 # directors  - list of directors to configure, must be an array of hashes
-#              [
-#                { name => 'director1', type => 'round-robin', backends => [ 'srv1', 'srv2' ] },
-#                { name => 'director2', type => 'round-robin', backends => [ 'srv3', 'srv4' ] },
-#              ]
+#              {
+#                director1 => { type => 'round-robin', backends => [ 'srv1', 'srv2' ] },
+#                director2 => { type => 'round-robin', backends => [ 'srv3', 'srv4' ] },
+#              }
 #
 # acls       - list of acls to configure, must be an array of hashes
 #              [
@@ -32,8 +32,8 @@
 #                { name => 'acl2', hosts => [ '"localhost"', '"10.1.0.0"/24', '! "10.1.0.1"' ] },
 #              ]
 #
-# selectors  - list of selectors, configured only when multiple backends/directors are in use, must be an array
-#              will be configured in the same order as listed in manifest
+# selectors  - list of selectors, configured only when multiple backends/directors are in use
+#              will be configured in the same order as listed in manifest. Must be a Hash
 #
 # conditions - list of conditions to apply, must be an array of hashes
 #
@@ -94,18 +94,31 @@
 #  selectors => [
 #    { backend => 'cluster2', condition => 'req.url ~ "^/cluster2"' },
 #    { backend => 'cluster2' },
-# ],
+#  ],
+#  acls => [
+#    { name => 'acl1', hosts => [ '"localhost"', '"10.0.0.0"/8' ] },
+#  ],
 # }
 #
 
 class varnish::vcl (
-  $probes     = [],
-  $backends   = [ { name => 'default', host => '127.0.0.1', port => '8080' } ],
-  $directors  = [],
-  $acls       = [],
-  $selectors  = [],
-  $conditions = [],
-  $template   = undef,
+  $probes            = {},
+  $backends          = { 'default' => { host => '127.0.0.1', port => '8080' } },
+  $directors         = [],
+  $selectors         = [],
+  $conditions        = [],
+  $acls              = {},
+  $blockedips	     = [],
+  $blockedbots	     = [],
+  $wafexceptions     = [ "57" , "56" , "34" ],
+  $purgeips          = [], 
+  $includedir        = "/etc/varnish/includes",
+  $cookiekeeps       = [ '__ac', '_ZopeId', 'captchasessionid', 'statusmessages', '__cp', 'MoodleSession'],
+  $defaultgrace      = undef,
+  $min_cache_time    = "60s",
+  $static_cache_time = "5m",
+  $gziptypes         = [ 'text/', 'application/xml', 'application/rss', 'application/xhtml', 'application/javascript', 'application/x-javascript' ],
+  $template          = undef,
 ) {
 
   include varnish
@@ -113,13 +126,40 @@ class varnish::vcl (
   # parameters for probe
   $probe_params = [ 'interval', 'timeout', 'threshold', 'window', 'url', 'request' ]
 
+  # define include file type
+  define includefile {
+    $selectors = $varnish::vcl::selectors
+    concat { "${varnish::vcl::includedir}/$title.vcl":
+       owner          => 'root',
+       group          => 'root',
+       mode           => '0444',
+       notify         => Service['varnish'],
+       require        => File["${varnish::vcl::includedir}"],
+    }
+
+    concat::fragment { "$title-header":
+       target => "${varnish::vcl::includedir}/$title.vcl",
+       content => '# File managed by Puppet
+',
+       order => '01',
+    }
+  }
+
+
   # select template to use
   if $template {
     $template_vcl = $template
   }
   else {
     $template_vcl = 'varnish/varnish-vcl.erb'
+    file { "$includedir":
+	ensure => directory,	
+    }
+    $includefiles = ["probes", "backends", "directors", "acls", "backendselection", "waf"]
+    includefile { $includefiles: }
   }
+
+  
 
   # vcl file
   file { 'varnish-vcl':
@@ -132,4 +172,50 @@ class varnish::vcl (
     notify  => Service['varnish'],
     require => Package['varnish'],
   }
+
+  # web application firewall
+  concat::fragment { "waf":
+    target => "${varnish::vcl::includedir}/waf.vcl",
+    content => template('varnish/includes/waf.vcl.erb'),
+    order => '02',
+  }
+
+
+  #Create resources
+ 
+  #Backends
+  validate_hash($backends)
+  create_resources(varnish::backend,$backends) 
+
+  #Probes
+  validate_hash($probes)
+  create_resources(varnish::probe,$probes) 
+  
+  #Directors
+  validate_hash($directors)
+  create_resources(varnish::director,$directors)
+
+  #Selectors
+  validate_hash($selectors)
+  concat::fragment { "selectors-header":
+    target => "${varnish::vcl::includedir}/backendselection.vcl",
+    content => 'if ( false ) { 
+',
+    order => '02',
+  }
+  create_resources(varnish::selector,$selectors)
+  concat::fragment { "selectors-footer":
+    target => "${varnish::vcl::includedir}/backendselection.vcl",
+    content => '} else { error 403 "Access denied"; }',
+    order => '99',
+  }
+
+  #ACLs
+  validate_hash($acls)
+  $default_acls = { 
+    blockedips => { hosts => $blockedips },
+    purge => { hosts => $purgeips },
+  } 
+  $all_acls = merge($default_acls, $acls)
+  create_resources(varnish::acl,$all_acls) 
 }
