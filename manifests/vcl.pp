@@ -117,9 +117,6 @@ class varnish::vcl (
 
   include varnish
 
-  # parameters for probe
-  $probe_params = [ 'interval', 'timeout', 'threshold', 'window', 'url', 'request' ]
-
   # define include file type
   define includefile {
     $selectors = $varnish::vcl::selectors
