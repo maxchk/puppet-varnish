@@ -1,7 +1,7 @@
 #backend.pp
 define varnish::backend ( $host,
                           $port,
-                          $probe,
+                          $probe = undef,
                         ) {
 
   concat::fragment { "$title-backend":
