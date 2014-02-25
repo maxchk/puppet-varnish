@@ -1,7 +1,7 @@
 #backend.pp
 define varnish::backend ( $host,
                           $port,
-                          $probe,
+                          $probe = undef,
                         ) {
 
   validate_re($title,'^[A-Za-z0-9_]*$', "Invalid characters in backend name $title. Only letters, numbers and underscore are allowed.")

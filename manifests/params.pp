@@ -5,7 +5,7 @@ class varnish::params {
 
   # set Varnish conf location based on OS
   $conf_file_path = $::operatingsystem ? {
-    /(?i:Centos|RedHat)/      => '/etc/sysconfig/varnish',
-    default                   => '/etc/default/varnish',
+    /(?i:Centos|RedHat|OracleLinux)/  => '/etc/sysconfig/varnish',
+    default                           => '/etc/default/varnish',
   }
 }
