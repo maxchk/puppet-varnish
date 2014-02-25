@@ -166,13 +166,6 @@ class varnish::vcl (
     order => '02',
   }
 
-  # web application firewall
-  concat::fragment { "waf":
-    target => "${varnish::vcl::includedir}/waf.vcl",
-    content => template('varnish/includes/waf.vcl.erb'),
-    order => '02',
-  }
-
   #Create resources
  
   #Backends
