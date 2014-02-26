@@ -1,0 +1,7 @@
+# set director <%= @title %>
+director <%= @title -%> <%= @type -%> {
+  <%- @backends.each do |backend| -%>
+  { .backend = <%= backend -%>; }
+  <%- end -%>
+}
+
