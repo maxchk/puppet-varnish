@@ -145,6 +145,8 @@ class varnish::vcl (
     includefile { $includefiles: }
   }
 
+  
+
   # vcl file
   file { 'varnish-vcl':
     ensure  => present,
@@ -163,7 +165,6 @@ class varnish::vcl (
     content => template('varnish/includes/waf.vcl.erb'),
     order => '02',
   }
-
 
   #Create resources
  
