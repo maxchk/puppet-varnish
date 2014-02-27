@@ -6,8 +6,8 @@
 
 ## Class varnish
 
-   Installs Varnish.  
-   Provides access to all configuration parameters.  
+   Installs Varnish.   
+   Provides access to all configuration parameters.   
    Controls Varnish service.  
    By default mounts shared memory log directory as tmpfs.  
 
@@ -167,7 +167,3 @@ be able to use `probes`, `backends`, `directors` and `selectors` parameters.
 ## Tests
    For more examples check module tests directory.  
    NOTE: make sure you don't run tests on Production server.  
-
-## Development
-  Contributions and patches are welcome!  
-  All new code goes into branch develop.  
