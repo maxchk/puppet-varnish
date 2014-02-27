@@ -1,4 +1,13 @@
-## Varnish module - install, configure and manage VCL (Ubuntu/CentOS)
+##Table of Contents
+1. [Varnish module - install, configure and manage VCL](#overview)
+2. [Class varnish](#class-varnish)
+3. [Setup Varnish](#setup-varnish)
+4. [Class varnish::vcl](#class-varnish::vcl)
+5. [Using class varnish::vcl](#using-class-varnish::vcl)
+6. [Tests](#tests)
+7. [Development](#development)
+
+## Overview
 
    This Puppet module installs and configures Varnish.  
    It also allows to manage Varnish VCL.  
@@ -28,7 +37,7 @@
 
 For more details on parameters, check class varnish.
 
-## Usage, class varnish
+## Setup Varnish
 
    installs Varnish  
    allocates for cache 1GB (malloc)  
@@ -42,10 +51,20 @@ For more details on parameters, check class varnish.
 ## Class varnish::vcl
 
    Manages Varnish VCL configuration.  
+   NOTE: though you can pass config for backends, directors, acls, probes and selectors  
+         as parameters to this class, it is recommended to use existing definitions instead:  
+
+    varnish::backend
+    varnish::director
+    varnish::probe
+    varnish::acl
+    varnish::selector
+
    In most cases Varnish default configuration will run just fine.  
    The only thing to configure are backends, directors and probes.  
 
    VCL applies following restictions:  
+   if you define an acl it must be used  
    if you define a probe it must be used  
    if you define a backend it must be used  
    if you define a director it must be used  
@@ -68,18 +87,22 @@ For more details on parameters, check class varnish.
    Parameter `selectors` gives access to req.backend inside vcl_recv.  
    Code:  
 
-    selectors => [
-      { backend => 'cluster2', condition => 'req.url ~ "^/cluster2"' },
-      { backend => 'cluster1' },
-    ],
+    selectors => {
+      'cluster1' => { condition => 'req.url ~ "^/cluster1"' },
+      'cluster2' => { condition => 'true' } # will act as backend set by else statement
+    }
 
 Will result in following VCL configuration to be generated:
 
-    if (req.url ~ "^/cluster2") {
-      set req.backend = cluster2;
-    } else {
+    if (false) { 
+    } elsif (req.url ~ "^/cluster1") {
       set req.backend = cluster1;
+    } elsif (true) {
+      set req.backend = cluster2;
+    } else { 
+      error 403 "Access denied"; 
     }
+
 
 `conditions` - TODO.
 
@@ -89,80 +112,77 @@ parameter `template` can be used to point `varnish::vcl` class at a different te
 NOTE: If you copy existing template and modify it you will still 
 be able to use `probes`, `backends`, `directors` and `selectors` parameters.
 
-## Usage, class varnish::vcl
+## Usaging class varnish::vcl
 
-   Simple setup:  
-   1 probe  
-   2 backends  
-   1 director  
+   Configure probes, backends, directors and selectors  
+   by passing parameters to class 
 
     class { 'varnish::vcl':
-      probes => [
-        { name => 'health_check', url => "/health_check" },
-      ],
-      backends => [
-        { name => 'server1', host => '192.168.1.1', port => '80', probe => 'health_check' },
-        { name => 'server2', host => '192.168.1.2', port => '80', probe => 'health_check' },
-      ],
-      directors => [
-        { name => 'cluster', type => 'round-robin', backends => [ 'server1', 'server2' ] }
-      ],
-      selectors => [
-        { backend => 'cluster' },
-      ],
-    }
 
-
-   Slightly more complex setup:  
-   2 probes  
-   8 backends  
-   2 directors  
-   traffic for URL /cluster2 goes to second director 'cluster2'
-
-    class { 'varnish::vcl':
-      probes => [
-        {
-          name      => 'health_check1',
+      # configure probes
+      probes => {
+        'health_check1' => { url => '/health_check_url1' },
+        'health_check2' => { 
           window    => '8',
           timeout   => '5s',
           threshold => '3',
           interval  => '5s',
-          request   => [ "GET /action/healthCheck1 HTTP/1.1", "Host: www.example1.com", "Connection: close" ],
-        },
-        {
-          name      => 'health_check2',
-          window    => '8',
-          timeout   => '5s',
-          threshold => '3',
-          interval  => '5s',
-          request   => [ "GET /action/healthCheck2 HTTP/1.1", "Host: www.example2.com", "Connection: close" ],
-        },
-      ],
-      backends => [
-        { name => 'server1', host => '192.168.1.21', port => '80', probe => 'health_check1' },
-        { name => 'server2', host => '192.168.1.22', port => '80', probe => 'health_check1' },
-        { name => 'server3', host => '192.168.1.23', port => '80', probe => 'health_check1' },
-        { name => 'server4', host => '192.168.1.24', port => '80', probe => 'health_check1' },
-        { name => 'server5', host => '192.168.1.25', port => '80', probe => 'health_check1' },
-        { name => 'server6', host => '192.168.1.26', port => '80', probe => 'health_check1' },
-        { name => 'server7', host => '192.168.1.27', port => '80', probe => 'health_check2' },
-        { name => 'server8', host => '192.168.1.28', port => '80', probe => 'health_check2' },
-      ],
-      directors => [
-        {
-          name     => 'cluster1',
-          backends => [ 'server1', 'server2', 'server3', 'server4', 'server5', 'server6' ],
-         },
-        {
-          name     => 'cluster2',
-          backends => [ 'server7', 'server8' ],
-        },
-      ],
-      selectors => [
-        { backend => 'cluster2', condition => 'req.url ~ "^/cluster2"' },
-        { backend => 'cluster1' },
-      ],
+          request   => [ "GET /action/healthCheck1 HTTP/1.1", "Host: www.example1.com", "Connection: close" ]
+        }
+      },
+
+      # configure backends
+      backends => { 
+        'srv1' => { host => '172.16.0.1', port => '80', probe => 'health_check1' },
+        'srv2' => { host => '172.16.0.2', port => '80', probe => 'health_check1' },
+        'srv3' => { host => '172.16.0.3', port => '80', probe => 'health_check2' },
+        'srv4' => { host => '172.16.0.4', port => '80', probe => 'health_check2' },
+        'srv5' => { host => '172.16.0.5', port => '80', probe => 'health_check2' },
+        'srv6' => { host => '172.16.0.6', port => '80', probe => 'health_check2' },
+      }, 
+
+      # configure directors
+      directors => {
+        'cluster1' => { backends => [ 'srv1', 'srv2' ] },
+        'cluster2' => { backends => [ 'srv3', 'srv4', 'srv5', 'srv6' ] }
+      },
+
+      # configure selectors
+      selectors => {
+        'cluster1' => { condition => 'req.url ~ "^/cluster1"' },
+        'cluster2' => { condition => 'true' }
+      }
     }
+
+   Same as above by using definitions  
+
+    class { 'varnish::vcl': }
+
+    # configure probes
+    varnish::probe { 'health_check1': url => '/health_check_url1' }
+    varnish::probe { 'health_check2':  
+      window    => '8',
+      timeout   => '5s',
+      threshold => '3',
+      interval  => '5s',
+      request   => [ "GET /action/healthCheck1 HTTP/1.1", "Host: www.example1.com", "Connection: close" ]
+    }
+
+    # configure backends
+    varnish::backend { 'srv1': host => '172.16.0.1', port => '80', probe => 'health_check1' }
+    varnish::backend { 'srv2': host => '172.16.0.2', port => '80', probe => 'health_check1' }
+    varnish::backend { 'srv3': host => '172.16.0.3', port => '80', probe => 'health_check2' }
+    varnish::backend { 'srv4': host => '172.16.0.4', port => '80', probe => 'health_check2' }
+    varnish::backend { 'srv5': host => '172.16.0.5', port => '80', probe => 'health_check2' }
+    varnish::backend { 'srv6': host => '172.16.0.6', port => '80', probe => 'health_check2' }
+
+    # configure directors
+    varnish::director { 'cluster1': backends => [ 'srv1', 'srv2' ] }
+    varnish::director { 'cluster2': backends => [ 'srv3', 'srv4', 'srv5', 'srv6' ] }
+
+    # configure selectors
+    varnish::selector { 'cluster1': condition => 'req.url ~ "^/cluster1"' }
+    varnish::selector { 'cluster2': condition => 'true' } # will act as backend set by else statement
 
 ## Tests
    For more examples check module tests directory.  
