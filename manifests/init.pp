@@ -77,7 +77,6 @@ class varnish (
 
   # install Varnish
   class {'varnish::install':
-    version => $version,
   }
 
   # enable Varnish service

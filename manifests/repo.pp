@@ -16,6 +16,7 @@ class varnish::repo (
   $repo_distro = $::operatingsystem ? {
     'RedHat'    => 'redhat',
     'LinuxMint' => 'ubuntu',
+    'centos'    => 'redhat',
     default     => downcase($::operatingsystem),
   }
 
@@ -25,11 +26,7 @@ class varnish::repo (
     default => '3.0',
   }
 
-  $repo_arch = $::architecture ? {
-    /^.*86$/ => 'x86',
-    /^.*64$/ => 'amd64',
-    default  => $::architecture,
-  }
+  $repo_arch = $::architecture
 
   $osver = split($::operatingsystemrelease, '[.]')
 
@@ -39,7 +36,7 @@ class varnish::repo (
         descr          => 'varnish',
         enabled        => '1',
         gpgcheck       => '0',
-        baseurl        => "${repo_base_url}/${repo_distro}/varnish-${repo_version}/${osver[0]}/${repo_arch}",
+        baseurl        => "${repo_base_url}/${repo_distro}/varnish-${repo_version}/el${osver[0]}/${repo_arch}",
       }
     }
     debian: {
