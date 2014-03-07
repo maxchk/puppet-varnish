@@ -171,3 +171,12 @@ be able to use `probes`, `backends`, `directors` and `selectors` parameters.
 ## Development
   Contributions and patches are welcome!  
   All new code goes into branch develop.  
+
+## Contributors
+- Max Horlanchuk <max.horlanchuk@gmail.com>
+- Fabio Rauber <fabiorauber@gmail.com>
+- Lienhart Woitok <lienhart.woitok@netlogix.de>
+- Matt Ward <matt.ward@envato.com>
+- Noel Sharpe <noels@radnetwork.co.uk>
+- Rich Kang <rich@saekang.co.uk>
+- browarrek <browarrek@gmail.com>
