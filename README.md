@@ -1,11 +1,33 @@
-## Varnish module - install, configure and manage VCL (Ubuntu/CentOS)
+##Table of Contents
+1. [Varnish module - install, configure and manage VCL](#overview)
+2. [Install Varnish](#install-varnish)
+3. [Class varnish](#class-varnish)
+4. [Class varnish::vcl](#class-varnish-vcl)
+5. [Configure VCL with class varnish::vcl](#configure-vcl-with-class-varnish-vcl)
+6. [Tests](#tests)
+7. [Development](#development)
+8. [Contributors](#contributors)
+
+## Overview
 
    This Puppet module installs and configures Varnish.  
    It also allows to manage Varnish VCL.  
    Tested on Ubuntu, CentOS, RHEL and Oracle Linux.
 
+## Install Varnish
+
+   installs Varnish  
+   allocates for cache 1GB (malloc)  
+   starts it on port 80:  
+
+    class {'varnish':
+      varnish_listen_port => 80,
+      varnish_storage_size => '1G',
+    }
+
 ## Class varnish
 
+  `varnish`  
    Installs Varnish.  
    Provides access to all configuration parameters.  
    Controls Varnish service.  
@@ -28,19 +50,9 @@
 
 For more details on parameters, check class varnish.
 
-## Usage, class varnish
+## Class varnish vcl
 
-   installs Varnish  
-   allocates for cache 1GB (malloc)  
-   starts it on port 80:  
-
-    class {'varnish':
-      varnish_listen_port => 80,
-      varnish_storage_size => '1G',
-    }
-
-## Class varnish::vcl
-
+   `varnish::vcl`  
    Manages Varnish VCL configuration.  
    In most cases Varnish default configuration will run just fine.  
    The only thing to configure are backends, directors and probes.  
@@ -89,8 +101,9 @@ parameter `template` can be used to point `varnish::vcl` class at a different te
 NOTE: If you copy existing template and modify it you will still 
 be able to use `probes`, `backends`, `directors` and `selectors` parameters.
 
-## Usage, class varnish::vcl
+## Configure VCL with class varnish vcl
 
+  `varnish::vcl`  
    Simple setup:  
    1 probe  
    2 backends  
@@ -176,6 +189,7 @@ be able to use `probes`, `backends`, `directors` and `selectors` parameters.
 - Max Horlanchuk <max.horlanchuk@gmail.com>
 - Fabio Rauber <fabiorauber@gmail.com>
 - Lienhart Woitok <lienhart.woitok@netlogix.de>
+- Samuel Leathers <sam@appliedtrust.com>
 - Matt Ward <matt.ward@envato.com>
 - Noel Sharpe <noels@radnetwork.co.uk>
 - Rich Kang <rich@saekang.co.uk>
