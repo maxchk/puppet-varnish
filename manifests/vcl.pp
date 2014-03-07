@@ -181,7 +181,7 @@ class varnish::vcl (
   create_resources(varnish::director,$directors)
 
   #Selectors
-  if $selectors {
+  if $selectors != {} {
     validate_hash($selectors)
     concat::fragment { "selectors-header":
       target => "${varnish::vcl::includedir}/backendselection.vcl",
