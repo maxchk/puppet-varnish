@@ -18,11 +18,11 @@
 #
 
 class varnish::install (
-  $version = present,
 ) {
+  class { 'varnish::repo': }
 
   # varnish package
   package { 'varnish':
-    ensure  => $version,
+    ensure  => $varnish::version,
   }
 }
