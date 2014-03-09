@@ -181,21 +181,23 @@ class varnish::vcl (
   create_resources(varnish::director,$directors)
 
   #Selectors
-  validate_hash($selectors)
-  concat::fragment { "selectors-header":
-    target => "${varnish::vcl::includedir}/backendselection.vcl",
-    content => 'if (false) {
-',
-    order => '02',
-  }
-  create_resources(varnish::selector,$selectors)
-  concat::fragment { "selectors-footer":
-    target => "${varnish::vcl::includedir}/backendselection.vcl",
-    content => '} else {
-  error 403 "Access denied";
+  if $selectors != {} {
+    validate_hash($selectors)
+    concat::fragment { "selectors-header":
+      target => "${varnish::vcl::includedir}/backendselection.vcl",
+      content => 'if (false) {
+',  
+      order => '02',
+    }
+    create_resources(varnish::selector,$selectors)
+    concat::fragment { "selectors-footer":
+      target => "${varnish::vcl::includedir}/backendselection.vcl",
+      content => '} else {
+    error 403 "Access denied";
 }
-',
-    order => '99',
+',  
+      order => '99',
+    }
   }
 
   #ACLs
