@@ -17,6 +17,7 @@ class varnish::repo (
     'RedHat'    => 'redhat',
     'LinuxMint' => 'ubuntu',
     'centos'    => 'redhat',
+    'amazon'    => 'redhat',
     default     => downcase($::operatingsystem),
   }
 
@@ -28,7 +29,17 @@ class varnish::repo (
 
   $repo_arch = $::architecture
 
-  $osver = split($::operatingsystemrelease, '[.]')
+  $osver_array = split($::operatingsystemrelease, '[.]')
+  if downcase($::operatingsystem) == 'amazon' {
+    $osver = $osver_array[0] ? {
+      '2'     => '5',
+      '3'     => '6',
+      default => undef,
+    }
+  }
+  else {
+    $osver = $osver_array[0]
+  }
 
   case $::osfamily {
     redhat: {
@@ -36,7 +47,7 @@ class varnish::repo (
         descr          => 'varnish',
         enabled        => '1',
         gpgcheck       => '0',
-        baseurl        => "${repo_base_url}/${repo_distro}/varnish-${repo_version}/el${osver[0]}/${repo_arch}",
+        baseurl        => "${repo_base_url}/${repo_distro}/varnish-${repo_version}/el${osver}/${repo_arch}",
       }
     }
     debian: {
