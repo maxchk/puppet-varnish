@@ -40,14 +40,6 @@
 #   varnish_storage_size => '2G',
 #   varnish_vcl_conf     => '/etc/varnish/my-vcl.vcl',
 # }
-# class {'varnish::vcl':
-#   backends => [ { name => 'server1', host => '192.168.1.1', port => '80' } ]
-# }
-#
-# NOTE: if you change value for $varnish_vcl_conf and don't make a call to varnish::vcl
-#       you'll end up with broken configuration, as file varnish_vcl_conf is built by varnish::vcl
-#
-# For more examples on VCL, please check Examples section for class varnish::vcl
 #
 
 class varnish (
