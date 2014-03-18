@@ -176,6 +176,14 @@ sub vcl_deliver {
 }
 
 sub vcl_error {
+     
+     ## Moved Permanently
+     if (obj.status == 750) {
+        set obj.http.Location = obj.response;
+        set obj.status = 301;
+        return(deliver);
+     }
+
      set obj.http.Content-Type = "text/html; charset=utf-8";
      set obj.http.Retry-After = "5";
      synthetic {"
