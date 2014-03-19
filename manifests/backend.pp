@@ -10,10 +10,15 @@ define varnish::backend ( $host,
     fail("Backend host $host is not an IP Address!")
   }
 
+  if $title == 'default' {
+    $set_target = "${varnish::vcl::includedir}/default_backend.vcl"
+  } else {
+    $set_target = "${varnish::vcl::includedir}/backends.vcl"
+  }
+
   concat::fragment { "$title-backend":
-    target => "${varnish::vcl::includedir}/backends.vcl",
+    target => $set_target,
     content => template('varnish/includes/backends.vcl.erb'),
     order => '02',
   }
-
 }

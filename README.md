@@ -83,7 +83,9 @@ For more details on parameters, check class varnish.
 
 ### varnish backend
 
-   Definition `varnish::backend` allows to configure Varnish backend:
+   Definition `varnish::backend` allows to configure Varnish backend:  
+   If you have a single backend, you can name it `default` and ignore  
+   `selector` sections:
 
     varnish::backend { 'srv1': host => '172.16.0.1', port => '80', probe => 'health_check1' }
     varnish::backend { 'srv2': host => '172.16.0.2', port => '80', probe => 'health_check1' }
@@ -91,6 +93,9 @@ For more details on parameters, check class varnish.
 ### varnish director
 
    Definition `varnish::director` allows to configure Varnish director:
+   If you have a single director, you can name it `default` and ignore  
+   `selector` sections:  
+   NOTE: you can't have backend `default` and director `deafult` in the same config
 
     varnish::director { 'cluster1': backends => [ 'srv1', 'srv2' ] }
 
@@ -112,14 +117,18 @@ For more details on parameters, check class varnish.
 
 Will result in following VCL configuration to be generated:
 
-    if (false) { 
-    } elsif (req.url ~ "^/cluster1") {
+    if (req.url ~ "^/cluster1") {
       set req.backend = cluster1;
-    } elsif (true) {
-      set req.backend = cluster2;
-    } else { 
-      error 403 "Access denied"; 
     }
+    if (true) {
+      set req.backend = cluster2;
+    }
+
+   `condition => 'true'`will act as backend set by else statement  
+   As an alternative, you can use name `default` when configuring  
+   backend or director.  
+   You need no `condition => 'true'` in this case bacause Varnish  
+   will use `default` backend/director as a default destination
 
 ## Usaging class varnish::vcl
 

@@ -9,70 +9,13 @@
 #       varnish::probe
 #       varnish::acl
 #       varnish::selector
+#       See README for details on how to use those
 #
 # === Parameters
 #
-# probes     - list of probes to configure, must be a hash:
-#    probes => {
-#      'health_check1' => { url => '/health_check_url1' },
-#      'health_check2' => {
-#        window    => '8',
-#        timeout   => '5s',
-#        threshold => '3',
-#        interval  => '5s',
-#        request   => [ "GET /action/healthCheck1 HTTP/1.1", "Host: www.example1.com", "Connection: close" ]
-#      }
-#    }
-#    NOTE: available probes are defined by array $probe_params in varnish::probe definition
-#          $probe_params = [ 'interval', 'timeout', 'threshold', 'window', 'url', 'request' ]
-#
-#
-# backends   - list of backends to configure, must be a hash
-#    backends => {
-#      'srv1' => { host => '172.16.0.1', port => '80', probe => 'health_check1' },
-#      'srv2' => { host => '172.16.0.2', port => '80', probe => 'health_check1' },
-#      'srv3' => { host => '172.16.0.3', port => '80', probe => 'health_check2' },
-#      'srv4' => { host => '172.16.0.4', port => '80', probe => 'health_check2' },
-#      'srv5' => { host => '172.16.0.5', port => '80', probe => 'health_check2' },
-#      'srv6' => { host => '172.16.0.6', port => '80', probe => 'health_check2' }
-#    }
-#
-#
-# directors  - list of directors to configure, must be a hash
-#              you can also provide $type which by default is set to 'round-robin'
-#    directors => {
-#      'cluster1' => { backends => [ 'srv1', 'srv2' ] },
-#      'cluster2' => { backends => [ 'srv3', 'srv4', 'srv5', 'srv6' ] }
-#    }
-#
-#
-# acls       - list of acls to configure, must be a hash
-#              NOTE: acl names 'blockedips' and 'purge' are reserved
-#                    and cannot be set by this parameter.
-#                    They exist as separate parameters for this class (see below)
-#              TODO: need to work out how to pass ! to acl, i.e.
-#                    acl blah {
-#                      "172.16.1.0"/24;
-#                      ! "172.16.1.1";
-#                    }
-#    acls => {
-#      'acl1' => { hosts => [ "localhost", "172.16.0.1" ] },
-#      'acl2' => { hosts => [ "localhost", "192.168.0.0/24" ] }
-#    }
-#
-#
-# selectors  - list of selectors, configured only when multiple backends/directors are in use
-#              will be configured in the same order as listed in manifest. Must be a Hash
-#    selectors => {
-#      'cluster1' => { condition => 'req.url ~ "^/cluster1"' },
-#      'cluster2' => { condition => 'true' } # will act as backend set by else statement
-#    }
-#
-#
-# conditions - list of conditions to apply, must be an array of hashes
-#
-# template   - you can build your own template and pass it to thei class with option template
-#              please make sure your template uses same vars and datatypes as original one
+# enable_waf - controls VCL WAF component, can be treu or false
+#              default value: false
+# 
 #
 #
 # NOTE: VCL applies following restictions:
@@ -84,12 +27,6 @@
 # You cannot define 2 or more backends/directors and not to have selectors
 # Not following above rules will result in VCL compilation failure
 #
-#
-# === Examples
-#
-# subdir tests has a number of examples on using either varnish::vsl class,
-# as well as varnish::backend, varnish::director, etc. definitions
-#
 class varnish::vcl (
   $probes            = {},
   $backends          = { 'default' => { host => '127.0.0.1', port => '8080' } },
@@ -99,6 +36,7 @@ class varnish::vcl (
   $acls              = {},
   $blockedips	     = [],
   $blockedbots	     = [],
+  $enable_waf        = false,
   $wafexceptions     = [ "57" , "56" , "34" ],
   $purgeips          = [], 
   $includedir        = "/etc/varnish/includes",
@@ -141,11 +79,10 @@ class varnish::vcl (
     file { "$includedir":
 	ensure => directory,	
     }
-    $includefiles = ["probes", "backends", "directors", "acls", "backendselection", "waf"]
+    $includefiles = ["probes", "backends", "default_backend", "directors", "default_director", "acls", "backendselection", "waf"]
     includefile { $includefiles: }
   }
 
-  
 
   # vcl file
   file { 'varnish-vcl':
@@ -181,24 +118,27 @@ class varnish::vcl (
   create_resources(varnish::director,$directors)
 
   #Selectors
-  if $selectors != {} {
-    validate_hash($selectors)
-    concat::fragment { "selectors-header":
-      target => "${varnish::vcl::includedir}/backendselection.vcl",
-      content => 'if (false) {
-',  
-      order => '02',
-    }
-    create_resources(varnish::selector,$selectors)
-    concat::fragment { "selectors-footer":
-      target => "${varnish::vcl::includedir}/backendselection.vcl",
-      content => '} else {
-    error 403 "Access denied";
-}
-',  
-      order => '99',
-    }
-  }
+  validate_hash($selectors)
+  create_resources(varnish::selector,$selectors)
+
+#  if $selectors != {} {
+#    validate_hash($selectors)
+#    concat::fragment { "selectors-header":
+#      target => "${varnish::vcl::includedir}/backendselection.vcl",
+#      content => 'if (false) {
+#',  
+#      order => '02',
+#    }
+#    create_resources(varnish::selector,$selectors)
+#    concat::fragment { "selectors-footer":
+#      target => "${varnish::vcl::includedir}/backendselection.vcl",
+#      content => '} else {
+#    error 403 "Access denied";
+#}
+#',  
+#      order => '99',
+#    }
+#  }
 
   #ACLs
   validate_hash($acls)
