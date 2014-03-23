@@ -71,19 +71,19 @@ For more details on parameters, check class varnish.
 
 ### varnish acl
 
-   Definition `varnish::acl` allows to configure Varnish acl:
+   Definition `varnish::acl` allows to configure Varnish acl.
 
     varnish::acl { 'acl1': hosts => [ "localhost", "172.16.0.1" ] }
 
 ### varnish probe
 
-   Definition `varnish::probe` allows to configure Varnish probe:
+   Definition `varnish::probe` allows to configure Varnish probe.
 
     varnish::probe { 'health_check1': url => '/health_check_url1' }
 
 ### varnish backend
 
-   Definition `varnish::backend` allows to configure Varnish backend:  
+   Definition `varnish::backend` allows to configure Varnish backend.
    If you have a single backend, you can name it `default` and ignore  
    `selector` sections:
 
@@ -92,7 +92,7 @@ For more details on parameters, check class varnish.
 
 ### varnish director
 
-   Definition `varnish::director` allows to configure Varnish director:
+   Definition `varnish::director` allows to configure Varnish director.  
    If you have a single director, you can name it `default` and ignore  
    `selector` sections:  
    NOTE: you can't have backend `default` and director `deafult` in the same config
