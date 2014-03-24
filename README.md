@@ -83,9 +83,10 @@ For more details on parameters, check class varnish.
 
 ### varnish backend
 
-   Definition `varnish::backend` allows to configure Varnish backend.
+   Definition `varnish::backend` allows to configure Varnish backend.  
    If you have a single backend, you can name it `default` and ignore  
-   `selector` sections:
+   `selector` sections.  
+   For more examples see `tests/vcl_backend_default.pp` and `tests/vcl_backends.pp`
 
     varnish::backend { 'srv1': host => '172.16.0.1', port => '80', probe => 'health_check1' }
     varnish::backend { 'srv2': host => '172.16.0.2', port => '80', probe => 'health_check1' }
@@ -93,9 +94,7 @@ For more details on parameters, check class varnish.
 ### varnish director
 
    Definition `varnish::director` allows to configure Varnish director.  
-   If you have a single director, you can name it `default` and ignore  
-   `selector` sections:  
-   NOTE: you can't have backend `default` and director `deafult` in the same config
+   For more examples see `tests/vcl_backends_probes_directors.pp`
 
     varnish::director { 'cluster1': backends => [ 'srv1', 'srv2' ] }
 
@@ -109,13 +108,13 @@ For more details on parameters, check class varnish.
    You cannot define 2 or more backends/directors and not to use them.  
    This will result in VCL compilation failure.  
 
-   Parameter `selectors` gives access to req.backend inside vcl_recv.  
+   Parameter `selectors` gives access to req.backend inside `vcl_recv`.  
    Code:  
 
     varnish::selector { 'cluster1': condition => 'req.url ~ "^/cluster1"' }
     varnish::selector { 'cluster2': condition => 'true' } # will act as backend set by else statement
 
-Will result in following VCL configuration to be generated:
+   Will result in following VCL configuration to be generated:
 
     if (req.url ~ "^/cluster1") {
       set req.backend = cluster1;
@@ -124,11 +123,7 @@ Will result in following VCL configuration to be generated:
       set req.backend = cluster2;
     }
 
-   `condition => 'true'`will act as backend set by else statement  
-   As an alternative, you can use name `default` when configuring  
-   backend or director.  
-   You need no `condition => 'true'` in this case bacause Varnish  
-   will use `default` backend/director as a default destination
+   For more examples see `tests/vcl_backends_probes_directors.pp`
 
 ## Usaging class varnish::vcl
 
@@ -143,7 +138,7 @@ Will result in following VCL configuration to be generated:
       timeout   => '5s',
       threshold => '3',
       interval  => '5s',
-      request   => [ "GET /action/healthCheck1 HTTP/1.1", "Host: www.example1.com", "Connection: close" ]
+      request   => [ "GET /healthCheck2 HTTP/1.1", "Host: www.example1.com", "Connection: close" ]
     }
 
     # configure backends

@@ -79,7 +79,7 @@ class varnish::vcl (
     file { "$includedir":
 	ensure => directory,	
     }
-    $includefiles = ["probes", "backends", "default_backend", "directors", "default_director", "acls", "backendselection", "waf"]
+    $includefiles = ["probes", "backends", "directors", "acls", "backendselection", "waf"]
     includefile { $includefiles: }
   }
 
@@ -120,25 +120,6 @@ class varnish::vcl (
   #Selectors
   validate_hash($selectors)
   create_resources(varnish::selector,$selectors)
-
-#  if $selectors != {} {
-#    validate_hash($selectors)
-#    concat::fragment { "selectors-header":
-#      target => "${varnish::vcl::includedir}/backendselection.vcl",
-#      content => 'if (false) {
-#',  
-#      order => '02',
-#    }
-#    create_resources(varnish::selector,$selectors)
-#    concat::fragment { "selectors-footer":
-#      target => "${varnish::vcl::includedir}/backendselection.vcl",
-#      content => '} else {
-#    error 403 "Access denied";
-#}
-#',  
-#      order => '99',
-#    }
-#  }
 
   #ACLs
   validate_hash($acls)
