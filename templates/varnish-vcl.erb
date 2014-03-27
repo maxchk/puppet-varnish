@@ -52,6 +52,7 @@ sub vcl_recv {
       error 403 "Access forbidden.";
   }
 
+  <%- if @enable_waf -%>
   # Web Application Firewall
   # These rules are defined by a number between semicolons. Example: ;48;
   # All expections must be defined at the req.http.EXCE variable
@@ -67,6 +68,7 @@ sub vcl_recv {
   }
   remove req.http.EXCE;
   remove req.http.RULE;
+  <%- end -%>
 
   # backend selection logic
   include "includes/backendselection.vcl";
