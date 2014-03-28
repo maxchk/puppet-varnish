@@ -6,12 +6,7 @@ class varnish::repo (
   $base_url = '',
   ) {
 
-  $repo_base_url = $base_url ? {
-    ''   => $::osfamily ? {
-      'RedHat' => 'http://repo.varnish-cache.org',
-      'Debian' => 'http://repo.varnish-cache.org/ubuntu/',
-    }
-  }
+  $repo_base_url = 'http://repo.varnish-cache.org'
 
   $repo_distro = $::operatingsystem ? {
     'RedHat'    => 'redhat',
