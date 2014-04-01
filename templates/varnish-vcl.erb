@@ -21,6 +21,13 @@ sub vcl_recv {
   # Default grace period
   set req.grace = <%= @defaultgrace %>;
 <%- end -%>
+<%- if @logrealip -%> 
+  if (req.http.X-Forwarded-For) {
+     std.log("RealIP:" + req.http.X-Forwarded-For); 
+  } else {
+     std.log("RealIP:" + client.ip); 
+  }
+<%- end -%>
 
   unset req.http.If-Modified-Since;
   unset req.http.If-None-Match; 
