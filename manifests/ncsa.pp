@@ -18,6 +18,7 @@ class varnish::ncsa (
       true => 'running',
       default => 'stopped',
     },
+    require => Service["varnish"],
     subscribe => File['/etc/default/varnishncsa'],
   }
 
