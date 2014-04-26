@@ -18,8 +18,9 @@
 #
 
 class varnish::install (
+  $add_repo = true
 ) {
-  class { 'varnish::repo': }
+  class { 'varnish::repo': enable => $add_repo }
 
   # varnish package
   package { 'varnish':

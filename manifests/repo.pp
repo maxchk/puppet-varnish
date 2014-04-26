@@ -4,6 +4,7 @@
 #
 class varnish::repo (
   $base_url = '',
+  $enable = true,
   ) {
 
   $repo_base_url = 'http://repo.varnish-cache.org'
@@ -35,24 +36,25 @@ class varnish::repo (
   else {
     $osver = $osver_array[0]
   }
-
-  case $::osfamily {
-    redhat: {
-      yumrepo { 'varnish':
-        descr          => 'varnish',
-        enabled        => '1',
-        gpgcheck       => '0',
-        baseurl        => "${repo_base_url}/${repo_distro}/varnish-${repo_version}/el${osver}/${repo_arch}",
+  if $enable {
+    case $::osfamily {
+      redhat: {
+        yumrepo { 'varnish':
+          descr          => 'varnish',
+          enabled        => '1',
+          gpgcheck       => '0',
+          baseurl        => "${repo_base_url}/${repo_distro}/varnish-${repo_version}/el${osver}/${repo_arch}",
+        }
       }
-    }
-    debian: {
-      apt::source { 'varnish':
-        location   => "${repo_base_url}/${repo_distro}",
-        repos      => "varnish-${repo_version}",
-        key_source => 'http://repo.varnish-cache.org/debian/GPG-key.txt',
+      debian: {
+        apt::source { 'varnish':
+          location   => "${repo_base_url}/${repo_distro}",
+          repos      => "varnish-${repo_version}",
+          key_source => 'http://repo.varnish-cache.org/debian/GPG-key.txt',
+        }
       }
-    }
-    default: {
+      default: {
+      }
     }
   }
 }
