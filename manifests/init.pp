@@ -16,6 +16,7 @@
 # shmlog_tempfs - mounts shmlog directory as tmpfs
 #                 default value: true
 # version       - passed to puppet type 'package', attribute 'ensure'
+# add_repo      - if set to false (defaults to true), the yum/apt repo is not added
 #
 # === Default values
 # Set to Varnish default values
@@ -62,6 +63,7 @@ class varnish (
   $shmlog_dir                   = '/var/lib/varnish',
   $shmlog_tempfs                = true,
   $version                      = present,
+  $add_repo                     = true,
 ) {
 
   # read parameters
@@ -69,6 +71,7 @@ class varnish (
 
   # install Varnish
   class {'varnish::install':
+    add_repo => $add_repo
   }
 
   # enable Varnish service
@@ -80,7 +83,7 @@ class varnish (
   if $shmlog_tempfs {
     class { 'varnish::shmlog':
       shmlog_dir => $shmlog_dir,
-      require => Package['varnish'],
+      require    => Package['varnish'],
     }
   }
 
