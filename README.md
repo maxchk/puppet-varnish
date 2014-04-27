@@ -183,6 +183,7 @@ For more details on parameters, check class varnish.
 - Fabio Rauber <fabiorauber@gmail.com>
 - Lienhart Woitok <lienhart.woitok@netlogix.de>
 - Samuel Leathers <sam@appliedtrust.com>
+- Frode Egeland <egeland@gmail.com>
 - Matt Ward <matt.ward@envato.com>
 - Noel Sharpe <noels@radnetwork.co.uk>
 - Rich Kang <rich@saekang.co.uk>
