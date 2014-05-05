@@ -97,11 +97,12 @@ class varnish::vcl (
   $selectors         = {},
   $conditions        = [],
   $acls              = {},
-  $blockedips	     = [],
+  $blockedips	       = [],
   $blockedbots	     = [],
   $wafexceptions     = [ "57" , "56" , "34" ],
-  $purgeips          = [], 
+  $purgeips          = [],
   $includedir        = "/etc/varnish/includes",
+  $manage_includes   = true,
   $cookiekeeps       = [ '__ac', '_ZopeId', 'captchasessionid', 'statusmessages', '__cp', 'MoodleSession'],
   $defaultgrace      = undef,
   $min_cache_time    = "60s",
@@ -138,14 +139,7 @@ class varnish::vcl (
   }
   else {
     $template_vcl = 'varnish/varnish-vcl.erb'
-    file { "$includedir":
-	ensure => directory,	
-    }
-    $includefiles = ["probes", "backends", "directors", "acls", "backendselection", "waf"]
-    includefile { $includefiles: }
   }
-
-  
 
   # vcl file
   file { 'varnish-vcl':
@@ -159,51 +153,59 @@ class varnish::vcl (
     require => Package['varnish'],
   }
 
-  # web application firewall
-  concat::fragment { "waf":
-    target => "${varnish::vcl::includedir}/waf.vcl",
-    content => template('varnish/includes/waf.vcl.erb'),
-    order => '02',
-  }
+  if $template == undef or $manage_includes {
+    file { "$includedir":
+      ensure => directory,
+    }
+    $includefiles = ["probes", "backends", "directors", "acls", "backendselection", "waf"]
+    includefile { $includefiles: }
 
-  #Create resources
- 
-  #Backends
-  validate_hash($backends)
-  create_resources(varnish::backend,$backends) 
+    # web application firewall
+    concat::fragment { "waf":
+      target => "${varnish::vcl::includedir}/waf.vcl",
+      content => template('varnish/includes/waf.vcl.erb'),
+      order => '02',
+    }
 
-  #Probes
-  validate_hash($probes)
-  create_resources(varnish::probe,$probes) 
-  
-  #Directors
-  validate_hash($directors)
-  create_resources(varnish::director,$directors)
+    #Create resources
 
-  #Selectors
-  validate_hash($selectors)
-  concat::fragment { "selectors-header":
-    target => "${varnish::vcl::includedir}/backendselection.vcl",
-    content => 'if (false) {
+    #Backends
+    validate_hash($backends)
+    create_resources(varnish::backend,$backends)
+
+    #Probes
+    validate_hash($probes)
+    create_resources(varnish::probe,$probes)
+
+    #Directors
+    validate_hash($directors)
+    create_resources(varnish::director,$directors)
+
+    #Selectors
+    validate_hash($selectors)
+    concat::fragment { "selectors-header":
+      target => "${varnish::vcl::includedir}/backendselection.vcl",
+      content => 'if (false) {
 ',
-    order => '02',
-  }
-  create_resources(varnish::selector,$selectors)
-  concat::fragment { "selectors-footer":
-    target => "${varnish::vcl::includedir}/backendselection.vcl",
-    content => '} else {
+      order => '02',
+    }
+    create_resources(varnish::selector,$selectors)
+    concat::fragment { "selectors-footer":
+      target => "${varnish::vcl::includedir}/backendselection.vcl",
+      content => '} else {
   error 403 "Access denied";
 }
 ',
-    order => '99',
-  }
+      order => '99',
+    }
 
-  #ACLs
-  validate_hash($acls)
-  $default_acls = { 
-    blockedips => { hosts => $blockedips },
-    purge => { hosts => $purgeips },
-  } 
-  $all_acls = merge($default_acls, $acls)
-  create_resources(varnish::acl,$all_acls) 
+    #ACLs
+    validate_hash($acls)
+    $default_acls = {
+      blockedips => { hosts => $blockedips },
+      purge => { hosts => $purgeips },
+    }
+    $all_acls = merge($default_acls, $acls)
+    create_resources(varnish::acl,$all_acls)
+  }
 }
