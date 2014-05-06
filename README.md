@@ -181,8 +181,9 @@ For more details on parameters, check class varnish.
 ## Contributors
 - Max Horlanchuk <max.horlanchuk@gmail.com>
 - Fabio Rauber <fabiorauber@gmail.com>
-- Lienhart Woitok <lienhart.woitok@netlogix.de>
 - Samuel Leathers <sam@appliedtrust.com>
+- Lienhart Woitok <lienhart.woitok@netlogix.de>
+- Adrian Webb <adrian.webb@coraltech.net>
 - Frode Egeland <egeland@gmail.com>
 - Matt Ward <matt.ward@envato.com>
 - Noel Sharpe <noels@radnetwork.co.uk>
