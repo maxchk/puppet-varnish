@@ -11,8 +11,8 @@
 # $varnish_vcl_conf    -> VARNISH_VCL_CONF
 # $varnish_listen_port -> VARNISH_LISTEN_PORT
 #
-# Exceptions are: 
-# shmlog_dir    - location for shmlog 
+# Exceptions are:
+# shmlog_dir    - location for shmlog
 # shmlog_tempfs - mounts shmlog directory as tmpfs
 #                 default value: true
 # version       - passed to puppet type 'package', attribute 'ensure'
@@ -27,14 +27,14 @@
 #
 # === Examples
 #
-# - installs Varnish 
-# - enabled Varnish service 
+# - installs Varnish
+# - enabled Varnish service
 # - uses default VCL '/etc/varnish/default.vcl'
 # class {'varnish': }
 #
-# same as above, plus 
+# same as above, plus
 # - sets Varnish to listen on port 80
-# - storage size is set to 2 GB 
+# - storage size is set to 2 GB
 # - vcl file is '/etc/varnish/my-vcl.vcl'
 # class {'varnish':
 #   varnish_listen_port  => '80',
