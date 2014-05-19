@@ -13,9 +13,9 @@
 #
 # === Parameters
 #
-# enable_waf - controls VCL WAF component, can be treu or false
+# enable_waf - controls VCL WAF component, can be true or false
 #              default value: false
-# 
+#
 #
 #
 # NOTE: VCL applies following restictions:
@@ -37,14 +37,14 @@ class varnish::vcl (
   $blockedips        = [],
   $blockedbots       = [],
   $enable_waf        = false,
-  $wafexceptions     = [ "57" , "56" , "34" ],
+  $wafexceptions     = [ '57' , '56' , '34' ],
   $purgeips          = [],
-  $includedir        = "/etc/varnish/includes",
+  $includedir        = '/etc/varnish/includes',
   $manage_includes   = true,
   $cookiekeeps       = [ '__ac', '_ZopeId', 'captchasessionid', 'statusmessages', '__cp', 'MoodleSession'],
   $defaultgrace      = undef,
-  $min_cache_time    = "60s",
-  $static_cache_time = "5m",
+  $min_cache_time    = '60s',
+  $static_cache_time = '5m',
   $gziptypes         = [ 'text/', 'application/xml', 'application/rss', 'application/xhtml', 'application/javascript', 'application/x-javascript' ],
   $template          = undef,
   $logrealip         = false,
@@ -55,19 +55,18 @@ class varnish::vcl (
   # define include file type
   define includefile {
     $selectors = $varnish::vcl::selectors
-    concat { "${varnish::vcl::includedir}/$title.vcl":
-       owner          => 'root',
-       group          => 'root',
-       mode           => '0444',
-       notify         => Service['varnish'],
-       require        => File["${varnish::vcl::includedir}"],
+    concat { "${varnish::vcl::includedir}/${title}.vcl":
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0444',
+      notify  => Service['varnish'],
+      require => File[$varnish::vcl::includedir],
     }
 
-    concat::fragment { "$title-header":
-       target => "${varnish::vcl::includedir}/$title.vcl",
-       content => '# File managed by Puppet
-',
-       order => '01',
+    concat::fragment { "${title}-header":
+      target  => "${varnish::vcl::includedir}/${title}.vcl",
+      content => "# File managed by Puppet\n",
+      order   => '01',
     }
   }
 
@@ -93,17 +92,17 @@ class varnish::vcl (
   }
 
   if $template == undef or $manage_includes {
-    file { "$includedir":
+    file { $includedir:
       ensure => directory,
     }
-    $includefiles = ["probes", "backends", "directors", "acls", "backendselection", "waf"]
+    $includefiles = ['probes', 'backends', 'directors', 'acls', 'backendselection', 'waf']
     includefile { $includefiles: }
 
     # web application firewall
-    concat::fragment { "waf":
-      target => "${varnish::vcl::includedir}/waf.vcl",
+    concat::fragment { 'waf':
+      target  => "${varnish::vcl::includedir}/waf.vcl",
       content => template('varnish/includes/waf.vcl.erb'),
-      order => '02',
+      order   => '02',
     }
 
     #Create resources
