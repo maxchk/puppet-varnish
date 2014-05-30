@@ -11,11 +11,12 @@
 # $varnish_vcl_conf    -> VARNISH_VCL_CONF
 # $varnish_listen_port -> VARNISH_LISTEN_PORT
 #
-# Exceptions are: 
-# shmlog_dir    - location for shmlog 
+# Exceptions are:
+# shmlog_dir    - location for shmlog
 # shmlog_tempfs - mounts shmlog directory as tmpfs
 #                 default value: true
 # version       - passed to puppet type 'package', attribute 'ensure'
+# add_repo      - if set to false (defaults to true), the yum/apt repo is not added
 #
 # === Default values
 # Set to Varnish default values
@@ -26,28 +27,20 @@
 #
 # === Examples
 #
-# - installs Varnish 
-# - enabled Varnish service 
+# - installs Varnish
+# - enabled Varnish service
 # - uses default VCL '/etc/varnish/default.vcl'
 # class {'varnish': }
 #
-# same as above, plus 
+# same as above, plus
 # - sets Varnish to listen on port 80
-# - storage size is set to 2 GB 
+# - storage size is set to 2 GB
 # - vcl file is '/etc/varnish/my-vcl.vcl'
 # class {'varnish':
 #   varnish_listen_port  => '80',
 #   varnish_storage_size => '2G',
 #   varnish_vcl_conf     => '/etc/varnish/my-vcl.vcl',
 # }
-# class {'varnish::vcl':
-#   backends => [ { name => 'server1', host => '192.168.1.1', port => '80' } ]
-# }
-#
-# NOTE: if you change value for $varnish_vcl_conf and don't make a call to varnish::vcl
-#       you'll end up with broken configuration, as file varnish_vcl_conf is built by varnish::vcl
-#
-# For more examples on VCL, please check Examples section for class varnish::vcl
 #
 
 class varnish (
@@ -70,6 +63,7 @@ class varnish (
   $shmlog_dir                   = '/var/lib/varnish',
   $shmlog_tempfs                = true,
   $version                      = present,
+  $add_repo                     = true,
 ) {
 
   # read parameters
@@ -77,7 +71,7 @@ class varnish (
 
   # install Varnish
   class {'varnish::install':
-    version => $version,
+    add_repo => $add_repo
   }
 
   # enable Varnish service
@@ -89,7 +83,7 @@ class varnish (
   if $shmlog_tempfs {
     class { 'varnish::shmlog':
       shmlog_dir => $shmlog_dir,
-      require => Package['varnish'],
+      require    => Package['varnish'],
     }
   }
 

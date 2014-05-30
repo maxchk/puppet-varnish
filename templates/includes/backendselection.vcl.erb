@@ -1,4 +1,4 @@
-} elsif (<%= @condition -%>) {
+if (<%= @condition -%>) {
     <%- if @movedto -%>
   error 750 "<%= @movedto -%>" + req.url;  
     <%- else -%>
@@ -7,3 +7,4 @@
   set req.url = <%= @newurl -%>;
       <%- end -%>
     <%- end -%>
+}

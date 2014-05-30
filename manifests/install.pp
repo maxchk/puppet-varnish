@@ -18,11 +18,12 @@
 #
 
 class varnish::install (
-  $version = present,
+  $add_repo = true
 ) {
+  class { 'varnish::repo': enable => $add_repo }
 
   # varnish package
   package { 'varnish':
-    ensure  => $version,
+    ensure  => $varnish::version,
   }
 }

@@ -21,6 +21,13 @@ sub vcl_recv {
   # Default grace period
   set req.grace = <%= @defaultgrace %>;
 <%- end -%>
+<%- if @logrealip -%> 
+  if (req.http.X-Forwarded-For) {
+     std.log("RealIP:" + req.http.X-Forwarded-For); 
+  } else {
+     std.log("RealIP:" + client.ip); 
+  }
+<%- end -%>
 
   unset req.http.If-Modified-Since;
   unset req.http.If-None-Match; 
@@ -52,6 +59,7 @@ sub vcl_recv {
       error 403 "Access forbidden.";
   }
 
+  <%- if @enable_waf -%>
   # Web Application Firewall
   # These rules are defined by a number between semicolons. Example: ;48;
   # All expections must be defined at the req.http.EXCE variable
@@ -67,6 +75,7 @@ sub vcl_recv {
   }
   remove req.http.EXCE;
   remove req.http.RULE;
+  <%- end -%>
 
   # backend selection logic
   include "includes/backendselection.vcl";

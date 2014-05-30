@@ -8,4 +8,9 @@ class varnish::params {
     /(?i:Centos|RedHat|OracleLinux)/  => '/etc/sysconfig/varnish',
     default                           => '/etc/default/varnish',
   }
+
+  $version = $varnish::version ? {
+    /4\..*/ => 4,
+    default => 3,
+  }
 }
