@@ -7,11 +7,13 @@ class varnish::firewall (
 	$varnish_listen_port = '6081',
 ) {
 
-	firewall { '100 allow port 80 to varnish':
-		chain  => 'INPUT',
-		proto  => 'tcp',
-		state  => ['NEW'],
-		dport  => $varnish_listen_port,
-		action => 'accept',
+	if $manage_firewall {
+		firewall { "100 allow port $varnish_listen_port to varnish":
+			chain  => 'INPUT',
+			proto  => 'tcp',
+			state  => ['NEW'],
+			dport  => $varnish_listen_port,
+			action => 'accept',
+		}
 	}
 }
