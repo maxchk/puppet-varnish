@@ -18,11 +18,18 @@
 #
 
 class varnish::install (
-  $add_repo = true
+  $add_repo = true,
+  $manage_firewall = true,
+  $varnish_listen_port
 ) {
   class { 'varnish::repo':
     enable => $add_repo,
     before => Package['varnish'],
+  }
+
+  class { 'varnish::firewall':
+	  enable              => $manage_firewall,
+	  varnish_listen_port => $varnish_listen_port,
   }
 
   # varnish package
