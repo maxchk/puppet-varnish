@@ -64,6 +64,7 @@ class varnish (
   $shmlog_tempfs                = true,
   $version                      = present,
   $add_repo                     = true,
+  $manage_firewall              = false,
 ) {
 
   # read parameters
@@ -71,7 +72,13 @@ class varnish (
 
   # install Varnish
   class {'varnish::install':
-    add_repo => $add_repo
+    add_repo            => $add_repo
+    manage_firewall     => $manage_firewall
+    varnish_listen_port => $varnish_listen_port
+  }
+
+  # add firewall rule for port 80
+  class {'varnish::firewall':
   }
 
   # enable Varnish service
