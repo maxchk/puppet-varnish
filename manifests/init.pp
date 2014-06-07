@@ -64,7 +64,7 @@ class varnish (
   $shmlog_tempfs                = true,
   $version                      = present,
   $add_repo                     = true,
-  $manage_firewall              = true,
+  $manage_firewall              = false,
 ) {
 
   # read parameters

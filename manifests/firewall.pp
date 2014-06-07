@@ -3,7 +3,7 @@
 # Uses puppetlabs/firewall module to open port 80
 #
 class varnish::firewall (
-	$manage_firewall     = true,
+	$manage_firewall     = false,
 	$varnish_listen_port = '6081',
 ) {
 

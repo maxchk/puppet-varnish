@@ -19,7 +19,7 @@
 
 class varnish::install (
   $add_repo = true,
-  $manage_firewall = true,
+  $manage_firewall = false,
   $varnish_listen_port
 ) {
   class { 'varnish::repo':
