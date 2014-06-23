@@ -72,13 +72,9 @@ class varnish (
 
   # install Varnish
   class {'varnish::install':
-    add_repo            => $add_repo
-    manage_firewall     => $manage_firewall
-    varnish_listen_port => $varnish_listen_port
-  }
-
-  # add firewall rule for port 80
-  class {'varnish::firewall':
+    add_repo            => $add_repo,
+    manage_firewall     => $manage_firewall,
+    varnish_listen_port => $varnish_listen_port,
   }
 
   # enable Varnish service
