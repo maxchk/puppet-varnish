@@ -1,6 +1,6 @@
 # Class varnish::firewall
 #
-# Uses puppetlabs/firewall module to open port 80
+# Uses puppetlabs/firewall module to open varnish listen port
 #
 class varnish::firewall (
 	$manage_firewall     = false,
