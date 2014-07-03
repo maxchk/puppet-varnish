@@ -50,6 +50,7 @@ class varnish::repo (
         apt::source { 'varnish':
           location   => "${repo_base_url}/${repo_distro}",
           repos      => "varnish-${repo_version}",
+          key        => 'C4DEFFEB',
           key_source => 'http://repo.varnish-cache.org/debian/GPG-key.txt',
         }
       }
