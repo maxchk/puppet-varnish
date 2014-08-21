@@ -76,10 +76,10 @@ class varnish::vcl (
   }
   else {
     $template_vcl = 'varnish/varnish-vcl.erb'
+  }
     file { "$includedir":
 	ensure => directory,	
     }
-  }
     $includefiles = ["probes", "backends", "directors", "acls", "backendselection", "waf"]
     includefile { $includefiles: }
 
