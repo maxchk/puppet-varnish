@@ -2,7 +2,7 @@ if (<%= @condition -%>) {
     <%- if @movedto -%>
   error 750 "<%= @movedto -%>" + req.url;  
     <%- else -%>
-  set req.backend = <%= @title -%>;
+  set req.backend = <%= @director -%>;
       <%- if @newurl -%>
   set req.url = <%= @newurl -%>;
       <%- end -%>
