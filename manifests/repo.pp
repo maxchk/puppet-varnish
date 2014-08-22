@@ -36,7 +36,7 @@ class varnish::repo (
   else {
     $osver = $osver_array[0]
   }
-  if $enable {
+  if str2bool($enable) {
     case $::osfamily {
       redhat: {
         yumrepo { 'varnish':
