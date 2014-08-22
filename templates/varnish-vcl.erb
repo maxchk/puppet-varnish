@@ -54,10 +54,12 @@ sub vcl_recv {
      remove req.http.Cookie;
   }
 
+  <%- if @blockedips.length > 0 -%>
   # blocked list
   if ((client.ip ~ blockedips)<%- if @blockedbots.length > 0 -%>||(req.http.User-Agent ~ "(?i)<%- @blockedbots.each do |bot| -%><%= bot %><%- if cookie != @blockedbots[-1] -%>|<%-end-%><%-end-%>")<%-end-%>) {
       error 403 "Access forbidden.";
   }
+  <%- end -%>
 
   <%- if @enable_waf -%>
   # Web Application Firewall
@@ -80,6 +82,7 @@ sub vcl_recv {
   # backend selection logic
   include "includes/backendselection.vcl";
 
+  <%- if @purgeips.length > 0 -%>
   # Allows purge for the IPs in purge ACL
   if (req.request == "PURGE") {
     if (!(client.ip ~ purge)) {
@@ -93,6 +96,7 @@ sub vcl_recv {
     # request won't go to the backend.
     error 200 "Added ban.";      
   }
+  <%- end -%>
 
   if (req.request != "GET" &&
       req.request != "HEAD" &&
