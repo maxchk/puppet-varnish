@@ -79,12 +79,6 @@ class varnish::vcl (
     $template_vcl = 'varnish/varnish-vcl.erb'
   }
 
-  file { "$includedir":
-    ensure => directory,	
-  }
-  $includefiles = ["probes", "backends", "directors", "acls", "backendselection", "waf"]
-  includefile { $includefiles: }
-
   # vcl file
   file { 'varnish-vcl':
     ensure  => present,
