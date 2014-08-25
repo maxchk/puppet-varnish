@@ -3,8 +3,9 @@ if (<%= @condition -%>) {
   error 750 "<%= @movedto -%>" + req.url;  
     <%- else -%>
   set req.backend = <%= @director -%>;
-      <%- if @options -%>
-  set req.http.x-host = <%= @options['req.http.x-host'] %>;
+      <%- if @rewrite -%>
+  set req.http.x-host = <%= @rewrite -%>;
+      <%- end -%>
       <%- if @newurl -%>
   set req.url = <%= @newurl -%>;
       <%- end -%>

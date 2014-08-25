@@ -2,6 +2,7 @@
 define varnish::selector(
   $director = $name,
   $condition,
+  $rewrite = undef,
   $newurl = undef,
   $movedto = undef,
 ) {
