@@ -43,6 +43,7 @@ class varnish::repo (
           descr          => 'varnish',
           enabled        => '1',
           gpgcheck       => '0',
+          priority       => '1',
           baseurl        => "${repo_base_url}/${repo_distro}/varnish-${repo_version}/el${osver}/${repo_arch}",
         }
       }
