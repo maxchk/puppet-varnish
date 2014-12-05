@@ -99,7 +99,7 @@ class varnish (
     mode    => '0644',
     content => template('varnish/varnish-conf.erb'),
     require => Package['varnish'],
-    notify  => Service['varnish'],
+    notify  => Exec['restart-varnish'],
   }
 
   # storage dir
