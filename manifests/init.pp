@@ -51,7 +51,7 @@ class varnish (
   $varnish_vcl_conf             = '/etc/varnish/default.vcl',
   $varnish_listen_address       = '',
   $varnish_listen_port          = '6081',
-  $varnish_admin_listen_address = '127.0.0.1',
+  $varnish_admin_listen_address = 'localhost',
   $varnish_admin_listen_port    = '6082',
   $varnish_min_threads          = '5',
   $varnish_max_threads          = '500',
