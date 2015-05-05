@@ -160,6 +160,7 @@ sub vcl_fetch {
   }
 
   <%- if @honor_backend_ttl -%>
+  # If no explicit TTL was set by the backend
   if (beresp.ttl < 0) {
   <%- end -%>
     # Default minimum cache period
