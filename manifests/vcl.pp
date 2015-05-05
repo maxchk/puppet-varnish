@@ -48,7 +48,6 @@ class varnish::vcl (
   $gziptypes         = [ 'text/', 'application/xml', 'application/rss', 'application/xhtml', 'application/javascript', 'application/x-javascript' ],
   $template          = undef,
   $logrealip         = false,
-  $cond_requests     = false,
 ) {
 
   include varnish
