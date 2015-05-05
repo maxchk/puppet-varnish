@@ -159,6 +159,9 @@ sub vcl_fetch {
     remove beresp.http.Set-Cookie;
   }
 
+  <%- if @honor_backend_ttl -%>
+  if (beresp.ttl < 0) {
+  <%- end -%>
   # Default minimum cache period 
   if(!(req.http.Cookie)&&!(beresp.http.Set-Cookie)&&(req.request == "GET")) {
      set beresp.ttl = <%= @min_cache_time %>;
@@ -180,6 +183,9 @@ sub vcl_fetch {
     return (hit_for_pass);
   } 
  
+  <%- if @honor_backend_ttl -%>
+  }
+  <%- end -%>
 }
 
 sub vcl_deliver {
