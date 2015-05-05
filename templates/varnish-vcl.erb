@@ -29,8 +29,10 @@ sub vcl_recv {
   }
 <%- end -%>
 
+<%- if not @cond_requests -%>
   unset req.http.If-Modified-Since;
-  unset req.http.If-None-Match; 
+  unset req.http.If-None-Match;
+<%- end -%>
 
   # cookie sanitization
   if (req.http.Cookie) {
