@@ -31,8 +31,27 @@ class varnish::service (
   }
 
   # varnish service
+  $reload_cmd = $::osfamily ? {
+    'debian'    => '/etc/init.d/varnish reload',
+    'redhat'    => '/sbin/service varnish reload',
+    default     => undef,
+  }
+
   service {'varnish':
     ensure  => $service_state,
+    restart => $reload_cmd,
     require => Package['varnish'],
   }
+
+  $restart_command = $::osfamily ? {
+    'debian'    => '/etc/init.d/varnish restart',
+    'redhat'    => '/sbin/service varnish restart',
+    default     => undef,
+  }
+
+  exec {'restart-varnish':
+    command => $restart_command,
+    refreshonly => true,
+  }
+
 }
