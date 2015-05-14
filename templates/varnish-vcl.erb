@@ -117,6 +117,11 @@ sub vcl_recv {
 }
 
 sub vcl_hash {
+  <%- if @x_forwarded_proto -%>
+  if (req.http.X-Forwarded-Proto) {
+    hash_data(req.http.X-Forwarded-Proto);
+  }
+  <%- end -%>
 }
 
 
