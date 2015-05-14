@@ -49,6 +49,7 @@ class varnish::vcl (
   $template          = undef,
   $logrealip         = false,
   $honor_backend_ttl = false,
+  $cond_requests     = false,
 ) {
 
   include varnish
