@@ -163,7 +163,7 @@ sub vcl_fetch {
 
   <%- if @honor_backend_ttl -%>
   # If no explicit TTL was set by the backend
-  if (beresp.ttl < 0) {
+  if (beresp.ttl < 0s) {
   <%- end -%>
     # Default minimum cache period
     if(!(req.http.Cookie)&&!(beresp.http.Set-Cookie)&&(req.request == "GET")) {
