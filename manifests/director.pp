@@ -19,7 +19,7 @@ define varnish::director(
     }
   }
 
-concat::fragment { "${title}-director":
+  concat::fragment { "${title}-director":
     target  => "${varnish::vcl::includedir}/directors.vcl",
     content => template($template_director),
     order   => '02',
