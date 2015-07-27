@@ -6,17 +6,15 @@ define varnish::director(
 
   validate_re($title,'^[A-Za-z0-9_]*$', "Invalid characters in director name ${title}. Only letters, numbers and underscore are allowed.")
 
-  $template_director = $::varnish::params::version ? {
-    4       => 'varnish/includes/directors4.vcl.erb',
-    default => 'varnish/includes/directors.vcl.erb',
-  }
-
-  if $template_director == 'varnish/includes/directors4.vcl.erb' {
+  if $::varnish::params::version == 4 {
+    $template_director = 'varnish/includes/directors4.vcl.erb',
     $director_object = $type ? {
       'round-robin' => 'round_robin',
       'client' => 'hash',
       default => $type
     }
+  } else {
+    $template_director = 'varnish/includes/directors.vcl.erb'
   }
 
   concat::fragment { "${title}-director":
