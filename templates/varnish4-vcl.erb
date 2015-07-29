@@ -2,6 +2,7 @@
 #
 vcl 4.0;
 import std;
+import directors;
 
 #Import file with probe definitions
 include "includes/probes.vcl";
@@ -9,11 +10,13 @@ include "includes/probes.vcl";
 #Import file with backend definitions
 include "includes/backends.vcl";
 
-#Import file with director definitions;
-include "includes/directors.vcl";
-
 #Import file with acl definitions
 include "includes/acls.vcl";
+
+sub vcl_init {
+ #Import file with director definitions;
+ include "includes/directors.vcl";
+}
 
 sub vcl_recv {
 <%- if @defaultgrace -%>
