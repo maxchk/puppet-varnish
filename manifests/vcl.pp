@@ -100,7 +100,8 @@ class varnish::vcl (
       require => Package['varnish'],
     }
     $includefiles = ['probes', 'backends', 'directors', 'acls', 'backendselection', 'waf']
-    includefile { $includefiles: }
+
+    varnish::vcl::includefile { $includefiles: }
 
     # web application firewall
     concat::fragment { 'waf':
