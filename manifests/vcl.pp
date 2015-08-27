@@ -136,5 +136,6 @@ class varnish::vcl (
     }
     $all_acls = merge($default_acls, $acls)
     create_resources(varnish::acl,$all_acls)
+    Varnish::Acl_member <| varnish_fqdn == $::fqdn |>
   }
 }
