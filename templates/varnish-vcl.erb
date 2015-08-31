@@ -29,8 +29,10 @@ sub vcl_recv {
   }
 <%- end -%>
 
+<%- if not @cond_requests -%>
   unset req.http.If-Modified-Since;
-  unset req.http.If-None-Match; 
+  unset req.http.If-None-Match;
+<%- end -%>
 
   # cookie sanitization
   if (req.http.Cookie) {
@@ -47,9 +49,11 @@ sub vcl_recv {
 
   if (
      # Static file cache
-     (req.url ~ "(?i)\.(jpg|jpeg|gif|png|tiff|tif|svg|swf|ico|css|kss|js|vsd|doc|ppt|pps|xls|pdf|mp3|mp4|m4a|ogg|mov|avi|wmv|sxw|zip|gz|bz2|tar|rar|odc|odb|odf|odg|odi|odp|ods|odt|sxc|sxd|sxi|sxw|dmg|torrent|deb|msi|iso|rpm|jar|class|flv|exe)$")||
+     ((req.url ~ "(?i)\.(jpg|jpeg|gif|png|tiff|tif|svg|swf|ico|css|kss|js|vsd|doc|ppt|pps|xls|pdf|mp3|mp4|m4a|ogg|mov|avi|wmv|sxw|zip|gz|bz2|tar|rar|odc|odb|odf|odg|odi|odp|ods|odt|sxc|sxd|sxi|sxw|dmg|torrent|deb|msi|iso|rpm|jar|class|flv|exe)$")||
      # Plone images cache
-     (req.url ~ "(?i)(image|imagem_large|image_preview|image_mini|image_thumb|image_tile|image_icon|imagem_listing)$")
+     (req.url ~ "(?i)(image|imagem_large|image_preview|image_mini|image_thumb|image_tile|image_icon|imagem_listing)$")) && 
+     # Plone resource editor
+     (req.url !~ "(?i)\@\@plone\.resourceeditor\.getfile\?path\=")
      ) {
      remove req.http.Cookie;
   }
@@ -113,6 +117,11 @@ sub vcl_recv {
 }
 
 sub vcl_hash {
+  <%- if @x_forwarded_proto -%>
+  if (req.http.X-Forwarded-Proto) {
+    hash_data(req.http.X-Forwarded-Proto);
+  }
+  <%- end -%>
 }
 
 
@@ -157,27 +166,34 @@ sub vcl_fetch {
     remove beresp.http.Set-Cookie;
   }
 
-  # Default minimum cache period 
-  if(!(req.http.Cookie)&&!(beresp.http.Set-Cookie)&&(req.request == "GET")) {
-     set beresp.ttl = <%= @min_cache_time %>;
-  }
+  <%- if @honor_backend_ttl -%>
+  # If no explicit TTL was set by the backend
+  if (beresp.ttl < 0s) {
+  <%- end -%>
+    # Default minimum cache period
+    if(!(req.http.Cookie)&&!(beresp.http.Set-Cookie)&&(req.request == "GET")) {
+       set beresp.ttl = <%= @min_cache_time %>;
+    }
 
-  if ( 
-     # Static file cache
-     (req.url ~ "(?i)\.(jpg|jpeg|gif|png|tiff|tif|svg|swf|ico|css|kss|js|vsd|doc|ppt|pps|xls|pdf|mp3|mp4|m4a|ogg|mov|avi|wmv|sxw|zip|gz|bz2|tar|rar|odc|odb|odf|odg|odi|odp|ods|odt|sxc|sxd|sxi|sxw|dmg|torrent|deb|msi|iso|rpm|jar|class|flv|exe)$")||
-     # Plone images cache
-     (req.url ~ "(?i)(image|imagem_large|image_preview|image_mini|image_thumb|image_tile|image_icon|imagem_listing)$")
-  ) {
-    set beresp.ttl = <%= @static_cache_time %>;
-    remove beresp.http.Set-Cookie;
-  }
+    if (
+       # Static file cache
+       (req.url ~ "(?i)\.(jpg|jpeg|gif|png|tiff|tif|svg|swf|ico|css|kss|js|vsd|doc|ppt|pps|xls|pdf|mp3|mp4|m4a|ogg|mov|avi|wmv|sxw|zip|gz|bz2|tar|rar|odc|odb|odf|odg|odi|odp|ods|odt|sxc|sxd|sxi|sxw|dmg|torrent|deb|msi|iso|rpm|jar|class|flv|exe)$")||
+       # Plone images cache
+       (req.url ~ "(?i)(image|imagem_large|image_preview|image_mini|image_thumb|image_tile|image_icon|imagem_listing)$")
+    ) {
+      set beresp.ttl = <%= @static_cache_time %>;
+      remove beresp.http.Set-Cookie;
+    }
 
-  #Avoid cache of objects > 100M
-  if ( beresp.http.Content-Length ~ "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]" ) { 
-    set beresp.ttl = <%= @static_cache_time %>; 
-    return (hit_for_pass);
-  } 
+    #Avoid cache of objects > 100M
+    if ( beresp.http.Content-Length ~ "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]" ) {
+      set beresp.ttl = <%= @static_cache_time %>;
+      return (hit_for_pass);
+    }
  
+  <%- if @honor_backend_ttl -%>
+  }
+  <%- end -%>
 }
 
 sub vcl_deliver {
