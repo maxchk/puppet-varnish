@@ -85,6 +85,9 @@ DAEMON_OPTS="-a ${VARNISH_LISTEN_ADDRESS}:${VARNISH_LISTEN_PORT} \
              -s ${VARNISH_STORAGE} \
              -u ${VARNISH_USER} \
              -g ${VARNISH_GROUP} \
+<% scope.lookupvar('varnish::extra_options').each_pair do |key,value| -%>
+             -p <%= key %>=<%= value %> \
+<% end -%>
 <% if scope.lookupvar('varnish::params::version') == 4 -%>
              -p thread_pool_min=${VARNISH_MIN_THREADS} \
              -p thread_pool_max=${VARNISH_MAX_THREADS} \

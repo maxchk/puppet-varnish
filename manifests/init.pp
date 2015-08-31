@@ -17,6 +17,11 @@
 #                 default value: true
 # version       - passed to puppet type 'package', attribute 'ensure'
 # add_repo      - if set to false (defaults to true), the yum/apt repo is not added
+# varnish_user  - user under which varnish daemon runs
+# varnish_group - group under which varnish daemon runs
+# extra_options - hash. generic options that can be passed on to the daemon via
+#                 the -p option. every key => value will result in a separate
+#                 -p key=value line
 #
 # === Default values
 # Set to Varnish default values
@@ -68,6 +73,7 @@ class varnish (
   $manage_firewall              = false,
   $varnish_user                 = 'varnish',
   $varnish_group                = 'varnish',
+  $extra_options                = {},
 ) {
 
   # read parameters
