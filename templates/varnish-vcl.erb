@@ -29,6 +29,23 @@ sub vcl_recv {
   }
 <%- end -%>
 
+<%- if @https_redirect -%>
+  # Redirect to https if coming over http according to X-Forwarded-Proto
+  if ( req.http.X-Forwarded-Proto && req.http.X-Forwarded-Proto !~ "(?i)https" && req.url !~ "no-ssl-rewrite" ) {
+
+    #Find what to use for hostname, either Host: or the server's ip
+    if (req.http.host) {
+        set req.http.x-redir-host = req.http.host;
+    } else {
+        set req.http.x-redir-host = server.ip;
+    }
+
+    set req.http.x-redir-url = "https://" + req.http.x-redir-host + req.url;
+
+    error 750 req.http.x-redir-url;
+  }
+<%- end -%>
+
 <%- if not @cond_requests -%>
   unset req.http.If-Modified-Since;
   unset req.http.If-None-Match;

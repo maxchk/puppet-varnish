@@ -51,6 +51,7 @@ class varnish::vcl (
   $honor_backend_ttl = false,
   $cond_requests     = false,
   $x_forwarded_proto = false,
+  $https_redirect    = false,
 ) {
 
   include varnish
