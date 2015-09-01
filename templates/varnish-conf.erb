@@ -68,6 +68,12 @@ VARNISH_STORAGE="<%= scope.lookupvar('storage_type') %>,${VARNISH_STORAGE_FILE},
 #
 # # Default TTL used when the backend does not specify one
 VARNISH_TTL=<%= scope.lookupvar('varnish_ttl') %>
+
+#
+# # user and group
+VARNISH_USER="<%= scope.lookupvar('varnish_user') %>"
+VARNISH_GROUP="<%= scope.lookupvar('varnish_group') %>"
+
 #
 # # DAEMON_OPTS is used by the init script.  If you add or remove options, make
 # # sure you update this section, too.
@@ -77,6 +83,11 @@ DAEMON_OPTS="-a ${VARNISH_LISTEN_ADDRESS}:${VARNISH_LISTEN_PORT} \
              -t ${VARNISH_TTL} \
              -S ${VARNISH_SECRET_FILE} \
              -s ${VARNISH_STORAGE} \
+             -u ${VARNISH_USER} \
+             -g ${VARNISH_GROUP} \
+<% scope.lookupvar('varnish::extra_options').each_pair do |key,value| -%>
+             -p <%= key %>=<%= value %> \
+<% end -%>
 <% if scope.lookupvar('varnish::params::version') == 4 -%>
              -p thread_pool_min=${VARNISH_MIN_THREADS} \
              -p thread_pool_max=${VARNISH_MAX_THREADS} \
