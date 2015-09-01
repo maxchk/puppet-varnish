@@ -1,0 +1,9 @@
+# set director <%= @title %>
+  new <%= @title -%> = directors.<%= @director_object -%>();
+  <%- @backends.each do |backend| -%>
+<%- if @director_object == 'hash' || @director_object == 'random' -%>
+  <%= @title -%>.add_backend(<%= backend -%>, 1.0);
+<%- else -%> 
+  <%= @title -%>.add_backend(<%= backend -%>);
+<%- end -%>
+  <%- end -%>

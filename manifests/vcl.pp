@@ -79,7 +79,10 @@ class varnish::vcl (
     $template_vcl = $template
   }
   else {
-    $template_vcl = 'varnish/varnish-vcl.erb'
+    $template_vcl = $::varnish::params::version ? {
+      4       => 'varnish/varnish4-vcl.erb',
+      default => 'varnish/varnish-vcl.erb',
+    }
   }
 
   # vcl file
@@ -136,5 +139,6 @@ class varnish::vcl (
     }
     $all_acls = merge($default_acls, $acls)
     create_resources(varnish::acl,$all_acls)
+    Varnish::Acl_member <| varnish_fqdn == $::fqdn |>
   }
 }
