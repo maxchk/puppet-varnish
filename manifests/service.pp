@@ -49,9 +49,15 @@ class varnish::service (
     default     => undef,
   }
 
-  exec {'restart-varnish':
-    command => $restart_command,
-    refreshonly => true,
+  $status_command = $::osfamily ? {
+    'debian'    => '/etc/init.d/varnish status',
+    'redhat'    => '/sbin/service varnish status',
+    default     => undef,
   }
 
+  exec {'restart-varnish':
+    command     => $restart_command,
+    refreshonly => true,
+    onlyif      => $status_command,
+  }
 }

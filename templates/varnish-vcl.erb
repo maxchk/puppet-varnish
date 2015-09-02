@@ -29,6 +29,23 @@ sub vcl_recv {
   }
 <%- end -%>
 
+<%- if @https_redirect -%>
+  # Redirect to https if coming over http according to X-Forwarded-Proto
+  if ( req.http.X-Forwarded-Proto && req.http.X-Forwarded-Proto !~ "(?i)https" && req.url !~ "no-ssl-rewrite" ) {
+
+    #Find what to use for hostname, either Host: or the server's ip
+    if (req.http.host) {
+        set req.http.x-redir-host = req.http.host;
+    } else {
+        set req.http.x-redir-host = server.ip;
+    }
+
+    set req.http.x-redir-url = "https://" + req.http.x-redir-host + req.url;
+
+    error 750 req.http.x-redir-url;
+  }
+<%- end -%>
+
 <%- if not @cond_requests -%>
   unset req.http.If-Modified-Since;
   unset req.http.If-None-Match;
@@ -47,6 +64,7 @@ sub vcl_recv {
     }
   }
 
+<%- if $drop_stat_cookies -%>
   if (
      # Static file cache
      ((req.url ~ "(?i)\.(jpg|jpeg|gif|png|tiff|tif|svg|swf|ico|css|kss|js|vsd|doc|ppt|pps|xls|pdf|mp3|mp4|m4a|ogg|mov|avi|wmv|sxw|zip|gz|bz2|tar|rar|odc|odb|odf|odg|odi|odp|ods|odt|sxc|sxd|sxi|sxw|dmg|torrent|deb|msi|iso|rpm|jar|class|flv|exe)$")||
@@ -57,6 +75,7 @@ sub vcl_recv {
      ) {
      remove req.http.Cookie;
   }
+<%- end -%>
 
   <%- if @blockedips.length > 0 -%>
   # blocked list
