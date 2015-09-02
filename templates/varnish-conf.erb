@@ -57,7 +57,7 @@ VARNISH_STORAGE_SIZE=<%= scope.lookupvar('varnish_storage_size') %>
 #
 # # File containing administration secret
 VARNISH_SECRET_FILE=<%= scope.lookupvar('varnish_secret_file') %>
-# 
+#
 # # Backend storage specification
 <% if scope.lookupvar('storage_type') == 'malloc' %>
 VARNISH_STORAGE="<%= scope.lookupvar('storage_type') %>,${VARNISH_STORAGE_SIZE}"
@@ -71,18 +71,22 @@ VARNISH_TTL=<%= scope.lookupvar('varnish_ttl') %>
 #
 # # DAEMON_OPTS is used by the init script.  If you add or remove options, make
 # # sure you update this section, too.
-DAEMON_OPTS="-a ${VARNISH_LISTEN_ADDRESS}:${VARNISH_LISTEN_PORT} \
-             -f ${VARNISH_VCL_CONF} \
-             -T ${VARNISH_ADMIN_LISTEN_ADDRESS}:${VARNISH_ADMIN_LISTEN_PORT} \
-             -t ${VARNISH_TTL} \
-             -S ${VARNISH_SECRET_FILE} \
-             -s ${VARNISH_STORAGE} \
+DAEMON_OPTS="-a <%= scope.lookupvar('varnish_listen_address') %>:<%= scope.lookupvar('varnish_listen_port') %> \
+             -f <%= scope.lookupvar('varnish_vcl_conf') %> \
+             -T <%= scope.lookupvar('varnish_admin_listen_address') %>:<%= scope.lookupvar('varnish_admin_listen_port') %> \
+             -t <%= scope.lookupvar('varnish_ttl') %> \
+             -S <%= scope.lookupvar('varnish_secret_file') %> \
+<% if scope.lookupvar('storage_type') == 'malloc' %>
+             -s "<%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_size') %>" \
+<% else %>
+             -s "<%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_file') %>,<%= scope.lookupvar('varnish_storage_size') %>" \
+<% end %>
 <% if scope.lookupvar('varnish::params::version') == 4 -%>
-             -p thread_pool_min=${VARNISH_MIN_THREADS} \
-             -p thread_pool_max=${VARNISH_MAX_THREADS} \
-             -p thread_pool_timeout=${VARNISH_THREAD_TIMEOUT}"
+             -p thread_pool_min=<%= scope.lookupvar('varnish_min_threads') %> \
+             -p thread_pool_max=<%= scope.lookupvar('varnish_max_threads') %> \
+             -p thread_pool_timeout=<%= scope.lookupvar('varnish_thread_timeout') %>"
 <% else -%>
-             -w ${VARNISH_MIN_THREADS},${VARNISH_MAX_THREADS},${VARNISH_THREAD_TIMEOUT}"
+             -w <%= scope.lookupvar('varnish_min_threads') %>,<%= scope.lookupvar('varnish_max_threads') %>,<%= scope.lookupvar('varnish_thread_timeout') %>"
 <% end %>
 
 
