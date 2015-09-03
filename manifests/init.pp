@@ -45,7 +45,7 @@
 
 class varnish (
   $start                        = 'yes',
-  $reload_vcl                   = false,
+  $reload_vcl                   = true,
   $nfiles                       = '131072',
   $memlock                      = '82000',
   $storage_type                 = 'malloc',
