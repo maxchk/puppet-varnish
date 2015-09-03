@@ -21,6 +21,12 @@ RELOAD_VCL=0
 <% end -%>
 <% end -%>
 
+<% if scope.lookupvar('varnish::params::version').to_i == 4 -%>
+# User and group for the varnishd worker processes
+VARNISH_USER=<%= scope.lookupvar('varnish_user') %>
+VARNISH_GROUP=<%= scope.lookupvar('varnish_group') %>
+<% end -%>
+
 # Maximum number of open files (for ulimit -n)
 NFILES=<%= scope.lookupvar('nfiles') %>
 
@@ -92,6 +98,8 @@ DAEMON_OPTS="-a <%= scope.lookupvar('varnish_listen_address') %>:<%= scope.looku
              -s <%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_file') %>,<%= scope.lookupvar('varnish_storage_size') %> \
 <% end -%>
 <% if scope.lookupvar('varnish::params::version').to_i == 4 -%>
+             -u <%= scope.lookupvar('varnish_user') %> \
+             -g <%= scope.lookupvar('varnish_group') %> \
              -p thread_pool_min=<%= scope.lookupvar('varnish_min_threads') %> \
              -p thread_pool_max=<%= scope.lookupvar('varnish_max_threads') %> \
              -p thread_pool_timeout=<%= scope.lookupvar('varnish_thread_timeout') %>"
