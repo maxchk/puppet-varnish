@@ -14,12 +14,12 @@ START=<%= scope.lookupvar('start') %>
 
 <% if scope.lookupvar('varnish::params::version').to_i == 4 -%>
 # Should systemd reload varnish incase of a vcl change?
-<% if scope.lookupvar('reload_vcl') %>
+<% if scope.lookupvar('reload_vcl') -%>
 RELOAD_VCL=1
-<% else %>
+<% else -%>
 RELOAD_VCL=0
-<% end %>
-<% end %>
+<% end -%>
+<% end -%>
 
 # Maximum number of open files (for ulimit -n)
 NFILES=<%= scope.lookupvar('nfiles') %>
@@ -86,17 +86,17 @@ DAEMON_OPTS="-a <%= scope.lookupvar('varnish_listen_address') %>:<%= scope.looku
              -T <%= scope.lookupvar('varnish_admin_listen_address') %>:<%= scope.lookupvar('varnish_admin_listen_port') %> \
              -t <%= scope.lookupvar('varnish_ttl') %> \
              -S <%= scope.lookupvar('varnish_secret_file') %> \
-<% if scope.lookupvar('storage_type') == 'malloc' %>
-             -s "<%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_size') %>" \
-<% else %>
-             -s "<%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_file') %>,<%= scope.lookupvar('varnish_storage_size') %>" \
-<% end %>
+<% if scope.lookupvar('storage_type') == 'malloc' -%>
+             -s <%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_size') %> \
+<% else -%>
+             -s <%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_file') %>,<%= scope.lookupvar('varnish_storage_size') %> \
+<% end -%>
 <% if scope.lookupvar('varnish::params::version').to_i == 4 -%>
              -p thread_pool_min=<%= scope.lookupvar('varnish_min_threads') %> \
              -p thread_pool_max=<%= scope.lookupvar('varnish_max_threads') %> \
              -p thread_pool_timeout=<%= scope.lookupvar('varnish_thread_timeout') %>"
 <% else -%>
              -w <%= scope.lookupvar('varnish_min_threads') %>,<%= scope.lookupvar('varnish_max_threads') %>,<%= scope.lookupvar('varnish_thread_timeout') %>"
-<% end %>
+<% end -%>
 
 
