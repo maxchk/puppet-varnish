@@ -60,4 +60,23 @@ class varnish::service (
     refreshonly => true,
     onlyif      => $status_command,
   }
+
+  if $::osfamily == 'RedHat' {
+    if $::operatingsystemmajrelease >= 7 {
+
+      file { '/usr/lib/systemd/system/varnish.service':
+        ensure => file,
+        source => 'puppet:///modules/varnish/varnish.service',
+        notify => Exec['Reload systemd'],
+      }
+
+      if (!defined(Exec['Reload systemd'])) {
+        exec {'Reload systemd':
+          command     => '/usr/bin/systemctl daemon-reload',
+          refreshonly => true,
+        }
+      }
+
+    }
+  }
 }
