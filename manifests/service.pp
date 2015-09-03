@@ -68,6 +68,7 @@ class varnish::service (
         ensure => file,
         source => 'puppet:///modules/varnish/varnish.service',
         notify => Exec['Reload systemd'],
+        before => Service['varnish'],
       }
 
       if (!defined(Exec['Reload systemd'])) {
