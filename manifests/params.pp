@@ -6,7 +6,7 @@ class varnish::params {
   # set Varnish conf location based on OS
   case $::osfamily {
     'RedHat': {
-      if $::operatingsystemmajrelease >= 7 {
+      if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
         $conf_file_path = '/etc/varnish/varnish.params'
       } else {
         $conf_file_path = '/etc/default/varnish'
@@ -18,7 +18,7 @@ class varnish::params {
   }
 
   $version = $varnish::version ? {
-    /4\..*/ => 4,
+    /4\..*/ => '4',
     default => $varnish::default_version,
   }
 }

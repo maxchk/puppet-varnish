@@ -7,7 +7,7 @@ define varnish::selector(
   $movedto = undef,
 ) {
   $template_selector = $::varnish::params::version ? {
-    4       => 'varnish/includes/backendselection4.vcl.erb',
+    '4'     => 'varnish/includes/backendselection4.vcl.erb',
     default => 'varnish/includes/backendselection.vcl.erb',
   }
 
