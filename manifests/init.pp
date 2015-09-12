@@ -45,10 +45,13 @@
 
 class varnish (
   $start                        = 'yes',
+  $reload_vcl                   = true,
   $nfiles                       = '131072',
   $memlock                      = '82000',
   $storage_type                 = 'malloc',
   $varnish_vcl_conf             = '/etc/varnish/default.vcl',
+  $varnish_user                 = 'varnish',
+  $varnish_group                = 'varnish',
   $varnish_listen_address       = '',
   $varnish_listen_port          = '6081',
   $varnish_admin_listen_address = 'localhost',
