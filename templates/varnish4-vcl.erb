@@ -62,7 +62,7 @@ sub vcl_recv {
   <%- if @blockedips.length > 0 -%>
   # blocked list
   if ((client.ip ~ blockedips)<%- if @blockedbots.length > 0 -%>||(req.http.User-Agent ~ "(?i)<%- @blockedbots.each do |bot| -%><%= bot %><%- if cookie != @blockedbots[-1] -%>|<%-end-%><%-end-%>")<%-end-%>) {
-    error 403 "Access forbidden.";
+    synth(403, "Access forbidden.");
   }
   <%- end -%>
 
@@ -78,7 +78,7 @@ sub vcl_recv {
   include "includes/waf.vcl";
   if (!(req.http.RULE == "")) {
     std.log( "ATTACK SIGNATURE rules:"+req.http.RULE+" url:"+req.url+" COOKIE:"+req.http.Cookie+"   IP:"+client.ip);
-    error 403 "ATTACK DETECTED - IP LOGGED";
+    synth(403, "ATTACK DETECTED - IP LOGGED");
   }
   unset req.http.EXCE;
   unset req.http.RULE;
@@ -91,7 +91,7 @@ sub vcl_recv {
   # Allows purge for the IPs in purge ACL
   if (req.method == "PURGE") {
     if (!(client.ip ~ purge)) {
-      error 405 "Not allowed.";
+      synth(405, "Not allowed.");
     }
     ban(" req.url == " + req.url);
     set req.url = regsuball(req.url,"80","443"); 
@@ -99,7 +99,7 @@ sub vcl_recv {
     ban(" req.url == " + req.url);
     # Throw a synthetic page so the
     # request won't go to the backend.
-    error 200 "Added ban.";
+    synth(200, "Added ban.");
   }
   <%- end -%>
 
