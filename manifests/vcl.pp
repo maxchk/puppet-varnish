@@ -53,6 +53,7 @@ class varnish::vcl (
   $x_forwarded_proto = false,
   $https_redirect    = false,
   $drop_stat_cookies = true,
+  $cond_unset_cookies = undef,
 ) {
 
   include varnish
