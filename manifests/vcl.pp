@@ -15,6 +15,9 @@
 #
 # enable_waf - controls VCL WAF component, can be true or false
 #              default value: false
+# pipe_chunked_post_put - If the request is a post/put with chunked transfer encoding,
+#                         pipe the request to the backend.
+#                         default value: false
 #
 #
 #
@@ -37,6 +40,7 @@ class varnish::vcl (
   $blockedips        = [],
   $blockedbots       = [],
   $enable_waf        = false,
+  $pipe_chunked_post = false,
   $wafexceptions     = [ '57' , '56' , '34' ],
   $purgeips          = [],
   $includedir        = '/etc/varnish/includes',
