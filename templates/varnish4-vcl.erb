@@ -106,6 +106,12 @@ sub vcl_recv {
     return (synth(200, "Added ban."));
   }
   <%- end -%>
+  <%- if @pipe_chunked_post_put -%>
+  /* We don't support chunked uploads, except when piping. */
+  if ((req.request == "POST" || req.request == "PUT") && req.http.transfer-encoding ~ "chunked") {
+    return(pipe);
+  }
+  <%- end %>
 
   if (req.method != "GET" &&
       req.method != "HEAD" &&
