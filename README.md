@@ -4,6 +4,7 @@
 3. [Class varnish](#class-varnish)
 4. [Class varnish::vcl](#class-varnish-vcl)
     * [varnish::acl](varnish-acl)
+    * [varnish::acl_member](varnish-acl_member)
     * [varnish::probe](varnish-probe)
     * [varnish::backend](varnish-backend)
     * [varnish::director](varnish-director)
@@ -74,6 +75,12 @@ For more details on parameters, check class varnish.
    Definition `varnish::acl` allows to configure Varnish acl.
 
     varnish::acl { 'acl1': hosts => [ "localhost", "172.16.0.1" ] }
+
+### varnish acl_membr
+
+   Definition `varnish::acl_member` allows to export member resources to be included in configuration of Varnish acl.
+
+    varnish::acl_member { fqdn => "your.varshish.fqdn", acl => 'acl1', host => $::ipaddress }
 
 ### varnish probe
 

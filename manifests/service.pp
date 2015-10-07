@@ -49,9 +49,36 @@ class varnish::service (
     default     => undef,
   }
 
-  exec {'restart-varnish':
-    command => $restart_command,
-    refreshonly => true,
+  $status_command = $::osfamily ? {
+    'debian'    => '/etc/init.d/varnish status',
+    'redhat'    => '/sbin/service varnish status',
+    default     => undef,
   }
 
+  exec {'restart-varnish':
+    command     => $restart_command,
+    refreshonly => true,
+    onlyif      => $status_command,
+  }
+
+  if $::osfamily == 'RedHat' {
+    if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
+
+      file { '/usr/lib/systemd/system/varnish.service':
+        ensure => file,
+        source => 'puppet:///modules/varnish/varnish.service',
+        notify => Exec['Reload systemd'],
+        before => Service['varnish'],
+        require => Package['varnish'],
+      }
+
+      if (!defined(Exec['Reload systemd'])) {
+        exec {'Reload systemd':
+          command     => '/usr/bin/systemctl daemon-reload',
+          refreshonly => true,
+        }
+      }
+
+    }
+  }
 }

@@ -48,8 +48,12 @@ class varnish::vcl (
   $gziptypes         = [ 'text/', 'application/xml', 'application/rss', 'application/xhtml', 'application/javascript', 'application/x-javascript' ],
   $template          = undef,
   $logrealip         = false,
+  $honor_backend_ttl = false,
   $cond_requests     = false,
+  $x_forwarded_proto = false,
+  $https_redirect    = false,
   $drop_stat_cookies = true,
+  $cond_unset_cookies = undef,
 ) {
 
   include varnish
@@ -78,7 +82,10 @@ class varnish::vcl (
     $template_vcl = $template
   }
   else {
-    $template_vcl = 'varnish/varnish-vcl.erb'
+    $template_vcl = $::varnish::params::version ? {
+      '4'     => 'varnish/varnish4-vcl.erb',
+      default => 'varnish/varnish-vcl.erb',
+    }
   }
 
   # vcl file
@@ -99,7 +106,8 @@ class varnish::vcl (
       require => Package['varnish'],
     }
     $includefiles = ['probes', 'backends', 'directors', 'acls', 'backendselection', 'waf']
-    includefile { $includefiles: }
+
+    varnish::vcl::includefile { $includefiles: }
 
     # web application firewall
     concat::fragment { 'waf':
@@ -134,5 +142,6 @@ class varnish::vcl (
     }
     $all_acls = merge($default_acls, $acls)
     create_resources(varnish::acl,$all_acls)
+    Varnish::Acl_member <| varnish_fqdn == $::fqdn |>
   }
 }

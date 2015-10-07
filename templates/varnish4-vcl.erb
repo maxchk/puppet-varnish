@@ -1,0 +1,186 @@
+# NOTE: this file is managed by puppet
+#
+vcl 4.0;
+import std;
+import directors;
+
+#Import file with probe definitions
+include "includes/probes.vcl";
+
+#Import file with backend definitions
+include "includes/backends.vcl";
+
+#Import file with acl definitions
+include "includes/acls.vcl";
+
+sub vcl_init {
+ #Import file with director definitions;
+ include "includes/directors.vcl";
+}
+
+sub vcl_recv {
+<%- if @defaultgrace -%>
+  # Default grace period
+  set req.grace = <%= @defaultgrace %>;
+<%- end -%>
+<%- if @logrealip -%>
+  if (req.http.X-Forwarded-For) {
+     std.log("RealIP:" + req.http.X-Forwarded-For); 
+  } else {
+     std.log("RealIP:" + client.ip); 
+  }
+<%- end -%>
+
+<%- if not @cond_requests -%>
+  unset req.http.If-Modified-Since;
+  unset req.http.If-None-Match;
+<%- end -%>
+
+  # cookie sanitization
+  if (req.http.Cookie) {
+    set req.http.Cookie = ";"+req.http.Cookie;
+    set req.http.Cookie = regsuball(req.http.Cookie, "; +", ";");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";(<%- @cookiekeeps.each do |cookie| -%><%= cookie %><%- if cookie != @cookiekeeps[-1] -%>|<%-end-%><%-end-%>)=", "; \1=");
+    set req.http.Cookie = regsuball(req.http.Cookie, ";[^ ][^;]*", "");
+    set req.http.Cookie = regsuball(req.http.Cookie, "^[; ]+|[; ]+$", "");
+    if (req.http.Cookie == "") {
+      unset req.http.Cookie;
+    }
+  }
+
+  if (
+<%- if @cond_unset_cookies -%>
+     <%= @cond_unset_cookies %>
+<%- else -%>
+    # Static file cache
+    ((req.url ~ "(?i)\.(jpg|jpeg|gif|png|tiff|tif|svg|swf|ico|css|kss|js|vsd|doc|ppt|pps|xls|pdf|mp3|mp4|m4a|ogg|mov|avi|wmv|sxw|zip|gz|bz2|tar|rar|odc|odb|odf|odg|odi|odp|ods|odt|sxc|sxd|sxi|sxw|dmg|torrent|deb|msi|iso|rpm|jar|class|flv|exe)$")||
+    # Plone images cache
+    (req.url ~ "(?i)(image|imagem_large|image_preview|image_mini|image_thumb|image_tile|image_icon|imagem_listing)$")) && 
+    # Plone resource editor
+    (req.url !~ "(?i)\@\@plone\.resourceeditor\.getfile\?path\=")
+<%- end -%>
+    ) {
+    unset req.http.Cookie;
+  }
+
+  <%- if @blockedips.length > 0 -%>
+  # blocked list
+  if ((client.ip ~ blockedips)<%- if @blockedbots.length > 0 -%>||(req.http.User-Agent ~ "(?i)<%- @blockedbots.each do |bot| -%><%= bot %><%- if cookie != @blockedbots[-1] -%>|<%-end-%><%-end-%>")<%-end-%>) {
+    return (synth(403, "Access forbidden."));
+  }
+  <%- end -%>
+
+  <%- if @enable_waf -%>
+  # Web Application Firewall
+  # These rules are defined by a number between semicolons. Example: ;48;
+  # All exceptions must be defined at the req.http.EXCE variable
+  # DO NOT MODIFY waf.vcl FILE!
+
+  set req.http.EXCE = ";<%- @wafexceptions.each do |exce| -%><%= exce %>;<%-end-%>";
+  set req.http.RULE = "";
+
+  include "includes/waf.vcl";
+  if (!(req.http.RULE == "")) {
+    std.log( "ATTACK SIGNATURE rules:"+req.http.RULE+" url:"+req.url+" COOKIE:"+req.http.Cookie+"   IP:"+client.ip);
+    return (synth(403, "ATTACK DETECTED - IP LOGGED"));
+  }
+  unset req.http.EXCE;
+  unset req.http.RULE;
+  <%- end -%>
+
+  # backend selection logic
+  include "includes/backendselection.vcl";
+
+  <%- if @purgeips.length > 0 -%>
+  # Allows purge for the IPs in purge ACL
+  if (req.method == "PURGE") {
+    if (!(client.ip ~ purge)) {
+      return (synth(405, "Not allowed."));
+    }
+    ban(" req.url == " + req.url);
+    set req.url = regsuball(req.url,"80","443"); 
+    set req.url = regsuball(req.url,"http","https");
+    ban(" req.url == " + req.url);
+    # Throw a synthetic page so the
+    # request won't go to the backend.
+    return (synth(200, "Added ban."));
+  }
+  <%- end -%>
+
+  if (req.method != "GET" &&
+      req.method != "HEAD" &&
+      req.method != "PUT" &&
+      req.method != "POST" &&
+      req.method != "TRACE" &&
+      req.method != "OPTIONS" &&
+      req.method != "DELETE") {
+    /* Non-RFC2616 or CONNECT which is weird. */
+    return (pipe);
+  }
+}
+
+sub vcl_hash {
+}
+
+sub vcl_pipe {
+  set req.http.Connection = "close";
+  return (pipe);
+}
+
+sub vcl_hit {
+  std.log( "CACHE-DEBUG URL:"+req.url+" COOKIE:"+req.http.Cookie+" AVISO:HIT IP:"+client.ip);
+}
+
+sub vcl_miss {
+  std.log( "CACHE-DEBUG URL:"+req.url+" COOKIE:"+req.http.Cookie+" AVISO:MISS IP:"+client.ip);
+}
+
+sub vcl_pass {
+  std.log( "CACHE-DEBUG URL:"+req.url+" COOKIE:"+req.http.Cookie+" AVISO:PASS IP:"+client.ip);
+}
+
+sub vcl_backend_response {
+<%- if @defaultgrace -%>
+  # Default grace period
+  set bereq.grace = <%= @defaultgrace %>;
+<%- end -%>
+
+  if (beresp.http.content-type ~ "<%- @gziptypes.each do |type| -%>^<%= type %><%- if type != @gziptypes[-1] -%>|<%-end-%><%-end-%>") {
+    set beresp.do_gzip = true;
+  }
+
+  # Remove I18N_LANGUAGE Set-Cookie
+  if (beresp.http.Set-Cookie ~ "I18N_LANGUAGE") {
+    unset beresp.http.Set-Cookie;
+  }
+
+  # Default minimum cache period
+  if(!(bereq.http.Cookie)&&!(beresp.http.Set-Cookie)&&(bereq.method == "GET")) {
+    set beresp.ttl = <%= @min_cache_time %>;
+  }
+
+  if (
+    # Static file cache
+    (bereq.url ~ "(?i)\.(jpg|jpeg|gif|png|tiff|tif|svg|swf|ico|css|kss|js|vsd|doc|ppt|pps|xls|pdf|mp3|mp4|m4a|ogg|mov|avi|wmv|sxw|zip|gz|bz2|tar|rar|odc|odb|odf|odg|odi|odp|ods|odt|sxc|sxd|sxi|sxw|dmg|torrent|deb|msi|iso|rpm|jar|class|flv|exe)$")||
+    # Plone images cache
+    (bereq.url ~ "(?i)(image|imagem_large|image_preview|image_mini|image_thumb|image_tile|image_icon|imagem_listing)$")
+  ) {
+    set beresp.ttl = <%= @static_cache_time %>;
+    unset beresp.http.Set-Cookie;
+  }
+
+  # Avoid cache of objects > 100M
+  if ( beresp.http.Content-Length ~ "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]" ) {
+    set beresp.uncacheable = true;
+    set beresp.ttl = <%= @static_cache_time %>;
+    return (deliver);
+  }
+}
+
+sub vcl_deliver {
+  if (obj.hits > 0) {
+    set resp.http.X-Cache = "HIT";
+  } else {
+    set resp.http.X-Cache = "MISS";
+  }
+}
