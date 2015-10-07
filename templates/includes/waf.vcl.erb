@@ -234,7 +234,7 @@
           if (!(req.http.EXCE ~ ";40;")){set req.http.RULE = req.http.RULE + ";40;";}
 	}
 
-	if (req.url ~ "(?i)\.(ini|scr)") 
+	if (req.url ~ "(?i)\.((ini|scr)$)") 
         {
           if (!(req.http.EXCE ~ ";41;")){set req.http.RULE = req.http.RULE + ";41;";}
 	}
