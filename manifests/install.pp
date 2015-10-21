@@ -28,8 +28,8 @@ class varnish::install (
   }
 
   class { 'varnish::firewall':
-	  manage_firewall     => $manage_firewall,
-	  varnish_listen_port => $varnish_listen_port,
+    manage_firewall     => $manage_firewall,
+    varnish_listen_port => $varnish_listen_port,
   }
 
   # varnish package
