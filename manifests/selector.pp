@@ -1,7 +1,7 @@
 #selector.pp
 define varnish::selector(
-  $director = $name,
   $condition,
+  $director = $name,
   $rewrite = undef,
   $newurl = undef,
   $movedto = undef,

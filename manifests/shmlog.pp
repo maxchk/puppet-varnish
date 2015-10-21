@@ -24,8 +24,8 @@ class varnish::shmlog (
 ) {
 
   file { 'shmlog-dir':
-    ensure  => directory,
-    path    => $shmlog_dir,
+    ensure => directory,
+    path   => $shmlog_dir,
   }
 
   # mount shared memory log dir as tmpfs
