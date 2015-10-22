@@ -26,6 +26,7 @@ class varnish::shmlog (
   file { 'shmlog-dir':
     ensure  => directory,
     path    => $shmlog_dir,
+    seltype => 'varnishd_var_lib_t',
   }
 
   # mount shared memory log dir as tmpfs
@@ -33,13 +34,19 @@ class varnish::shmlog (
     true    => mounted,
     default => absent,
   }
+
+  $options = $::selinux ? {
+    true    => "defaults,noatime,size=${size},rootcontext=system_u:object_r:varnishd_var_lib_t:s0",
+    default => "defaults,noatime,size=${size}",
+  }
+
   mount { 'shmlog-mount':
     ensure  => $shmlog_share_state,
     name    => $shmlog_dir,
     target  => '/etc/fstab',
     fstype  => 'tmpfs',
     device  => 'tmpfs',
-    options => "defaults,noatime,size=${size}",
+    options => $options,
     pass    => '0',
     dump    => '0',
     require => File['shmlog-dir'],
