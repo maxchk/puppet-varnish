@@ -234,7 +234,7 @@
           if (!(req.http.EXCE ~ ";40;")){set req.http.RULE = req.http.RULE + ";40;";}
 	}
 
-	if (req.url ~ "(?i)\.(ini|scr)") 
+	if (req.url ~ "(?i)\.((ini|scr)$)") 
         {
           if (!(req.http.EXCE ~ ";41;")){set req.http.RULE = req.http.RULE + ";41;";}
 	}
@@ -369,4 +369,21 @@
         {
           if (!(req.http.EXCE ~ ";63;")){set req.http.RULE = req.http.RULE + ";63;";}
         } 
-        #END FILE INJECTION 
+        #END FILE INJECTION
+
+
+
+        #ZOPE/PLONE MANAGEMENT INTERFACE
+        # Blocks access to ZMI
+        if (req.url ~ "(?i)/manage(_.+)?$")
+        {
+          if (!(req.http.EXCE ~ ";64;")){set req.http.RULE = req.http.RULE + ";64;";}
+        }
+
+        # Blocks acces to the Undo forms
+        if (req.url ~ "(?i)Undoform")
+        {
+          if (!(req.http.EXCE ~ ";65;")){set req.http.RULE = req.http.RULE + ";65;";}
+        }
+        #END ZOPE/PLONE MANAGEMENT INTERFACE
+
