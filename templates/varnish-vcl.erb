@@ -16,7 +16,12 @@ include "includes/directors.vcl";
 include "includes/acls.vcl";
 
 sub vcl_recv {
-
+<%- if @functions['vcl_recv'] -%>
+  <%= @functions.delete('vcl_recv') %>
+<%- else -%>
+<%- if @functions['vcl_recv_prepend'] -%>
+  <%= @functions.delete('vcl_recv_prepend') %>
+<%- end -%>
 <%- if @defaultgrace -%>
   # Default grace period
   set req.grace = <%= @defaultgrace %>;
@@ -131,46 +136,70 @@ sub vcl_recv {
      /* Non-RFC2616 or CONNECT which is weird. */
      return (pipe);
   }
-
-
+<%- if @functions['vcl_recv_append'] -%>
+  <%= @functions.delete('vcl_recv_append') %>
+<%- end -%>
+<%- end -%>
 }
 
 sub vcl_hash {
+<%- if @functions['vcl_hash'] -%>
+  <%= @functions.delete('vcl_hash') %>
+<%- else -%>
   <%- if @x_forwarded_proto -%>
   if (req.http.X-Forwarded-Proto) {
     hash_data(req.http.X-Forwarded-Proto);
   }
   <%- end -%>
+<%- end -%>
 }
 
 
 sub vcl_pipe {
+<%- if @functions['vcl_pipe'] -%>
+  <%= @functions.delete('vcl_pipe') %>
+<%- else -%>
   set req.http.Connection = "close";  
   return (pipe);
+<%- end -%>
 }
 
 sub vcl_hit {
+<%- if @functions['vcl_hit'] -%>
+  <%= @functions.delete('vcl_hit') %>
+<%- else -%>
    std.log( "CACHE-DEBUG URL:"+req.url+" COOKIE:"+req.http.Cookie+" AVISO:HIT IP:"+client.ip);
    if (req.request == "PURGE") {
       purge;
       error 200 "Purged.";
    }
+<%- end -%>
 }
 
 sub vcl_miss {
+<%- if @functions['vcl_miss'] -%>
+  <%= @functions.delete('vcl_miss') %>
+<%- else -%>
     std.log( "CACHE-DEBUG URL:"+req.url+" COOKIE:"+req.http.Cookie+" AVISO:MISS IP:"+client.ip);
     if (req.request == "PURGE") {
        purge;
        error 200 "Purged.";
     }
+<%- end -%>
 }
 
 sub vcl_pass {
+<%- if @functions['vcl_pass'] -%>
+  <%= @functions.delete('vcl_pass') %>
+<%- else -%>
    std.log( "CACHE-DEBUG URL:"+req.url+" COOKIE:"+req.http.Cookie+" AVISO:PASS IP:"+client.ip);
+<%- end -%>
 }
 
 sub vcl_fetch {
-
+<%- if @functions['vcl_fetch'] -%>
+  <%= @functions.delete('vcl_fetch') %>
+<%- else -%>
 <%- if @defaultgrace -%>
   # Default grace period
   set req.grace = <%= @defaultgrace %>;
@@ -213,18 +242,25 @@ sub vcl_fetch {
   <%- if @honor_backend_ttl -%>
   }
   <%- end -%>
+<%- end -%>
 }
 
 sub vcl_deliver {
+<%- if @functions['vcl_deliver'] -%>
+  <%= @functions.delete('vcl_deliver') %>
+<%- else -%>
      if (obj.hits > 0) {
          set resp.http.X-Cache = "HIT";
      } else {
          set resp.http.X-Cache = "MISS";
      }
+<%- end -%>
 }
 
 sub vcl_error {
-     
+<%- if @functions['vcl_error'] -%>
+  <%= @functions.delete('vcl_error') %>
+<%- else -%>
      ## Moved Permanently
      if (obj.status == 750) {
         set obj.http.Location = obj.response;
@@ -253,12 +289,11 @@ sub vcl_error {
  </html>
  "};
      return (deliver);
+<%- end -%>
 }
-# 
-# sub vcl_init {
-# 	return (ok);
-# }
-# 
-# sub vcl_fini {
-# 	return (ok);
-# }
+
+<%- @functions.each do |sub, content| -%>
+sub <%= sub %> {
+<%= content %>
+}
+<%- end -%>
