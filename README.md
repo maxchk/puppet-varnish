@@ -174,7 +174,7 @@ For more details on parameters, check class varnish.
 
    With the module comes the basic Varnish vcl configuration file. If needed one can replace default 
    functions in the configuration file with own ones and/or define custom functions. 
-   Override or custom functions specified in the array passed to `varnish::vcl` claas as parameter `functions`.
+   Override or custom functions specified in the array passed to `varnish::vcl` class as parameter `functions`.
    The best way to do it is to use hiera. For example:
    ```yaml
    varnish::vcl::functions:
