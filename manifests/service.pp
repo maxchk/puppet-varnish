@@ -29,6 +29,10 @@ class varnish::service (
     'no'    => stopped,
     default => running,
   }
+  $service_enable = $start ? {
+    'no'    => false,
+    default => true,
+  }
 
   # varnish service
   $reload_cmd = $::osfamily ? {
@@ -39,6 +43,7 @@ class varnish::service (
 
   service {'varnish':
     ensure  => $service_state,
+    enable  => $service_enable,
     restart => $reload_cmd,
     require => Package['varnish'],
   }
