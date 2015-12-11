@@ -188,6 +188,10 @@ sub vcl_backend_response {
   if (beresp.http.Set-Cookie ~ "I18N_LANGUAGE") {
     unset beresp.http.Set-Cookie;
   }
+  <%- if @honor_backend_ttl -%>
+  # If no explicit TTL was set by the backend
+  if (beresp.ttl < 0s) {
+  <%- end -%>
 
   # Default minimum cache period
   if(!(bereq.http.Cookie)&&!(beresp.http.Set-Cookie)&&(bereq.method == "GET")) {
@@ -210,6 +214,9 @@ sub vcl_backend_response {
     set beresp.ttl = <%= @static_cache_time %>;
     return (deliver);
   }
+  <%- if @honor_backend_ttl -%>
+  }
+  <%- end -%>
 <%- end -%>
 }
 
