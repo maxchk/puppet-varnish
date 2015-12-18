@@ -19,6 +19,6 @@ class varnish::params {
 
   $version = $varnish::version ? {
     /4\..*/ => '4',
-    default => $varnish::default_version,
+    default => 3,
   }
 }

@@ -66,7 +66,6 @@ class varnish (
   $shmlog_dir                   = '/var/lib/varnish',
   $shmlog_tempfs                = true,
   $version                      = present,
-  $default_version              = 3,
   $add_repo                     = true,
   $manage_firewall              = false,
 ) {
