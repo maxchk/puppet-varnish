@@ -40,7 +40,7 @@ class varnish::vcl (
   $blockedips        = [],
   $blockedbots       = [],
   $enable_waf        = false,
-  $pipe_chunked_post = false,
+  $pipe_chunked_post_put = false,
   $wafexceptions     = [ '57' , '56' , '34' ],
   $purgeips          = [],
   $includedir        = '/etc/varnish/includes',
