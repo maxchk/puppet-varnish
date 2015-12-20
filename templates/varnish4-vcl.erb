@@ -106,6 +106,12 @@ sub vcl_recv {
     return (synth(200, "Added ban."));
   }
   <%- end -%>
+  <%- if @pipe_uploads -%>
+  /* Pipe chunked or multipart uploads to avoid timeout */
+  if ((req.method == "POST" || req.method == "PUT") && (req.http.transfer-encoding ~ "chunked" || req.http.Content-Type ~ "multipart/form-data")) {
+    return(pipe);
+  }
+  <%- end %>
 
   if (req.method != "GET" &&
       req.method != "HEAD" &&
