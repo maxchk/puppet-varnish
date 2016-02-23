@@ -12,7 +12,7 @@
 # Should we start varnishd at boot?  Set to "no" to disable.
 START=<%= scope.lookupvar('start') %>
 
-<% if scope.lookupvar('varnish::params::version').to_i == 4 -%>
+<% if scope.lookupvar('varnish::varnish_version').to_i == 4 -%>
 # Should systemd reload varnish incase of a vcl change?
 <% if scope.lookupvar('reload_vcl') -%>
 RELOAD_VCL=1
@@ -21,7 +21,7 @@ RELOAD_VCL=0
 <% end -%>
 <% end -%>
 
-<% if scope.lookupvar('varnish::params::version').to_i == 4 -%>
+<% if scope.lookupvar('varnish::varnish_version').to_i == 4 -%>
 # User and group for the varnishd worker processes
 VARNISH_USER=<%= scope.lookupvar('varnish_user') %>
 VARNISH_GROUP=<%= scope.lookupvar('varnish_group') %>
@@ -86,7 +86,7 @@ VARNISH_TTL=<%= scope.lookupvar('varnish_ttl') %>
 #
 # # DAEMON_OPTS is used by the init script.  If you add or remove options, make
 # # sure you update this section, too.
-# Version: <%= scope.lookupvar('varnish::params::version') %>
+# Version: <%= scope.lookupvar('varnish::varnish_version') %>
 DAEMON_OPTS="-a <%= scope.lookupvar('varnish_listen_address') %>:<%= scope.lookupvar('varnish_listen_port') %> \
              -f <%= scope.lookupvar('varnish_vcl_conf') %> \
              -T <%= scope.lookupvar('varnish_admin_listen_address') %>:<%= scope.lookupvar('varnish_admin_listen_port') %> \
@@ -97,7 +97,7 @@ DAEMON_OPTS="-a <%= scope.lookupvar('varnish_listen_address') %>:<%= scope.looku
 <% else -%>
              -s <%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_file') %>,<%= scope.lookupvar('varnish_storage_size') %> \
 <% end -%>
-<% if scope.lookupvar('varnish::params::version').to_i == 4 -%>
+<% if scope.lookupvar('varnish::varnish_version').to_i == 4 -%>
              -u <%= scope.lookupvar('varnish_user') %> \
              -g <%= scope.lookupvar('varnish_group') %> \
              -p thread_pool_min=<%= scope.lookupvar('varnish_min_threads') %> \

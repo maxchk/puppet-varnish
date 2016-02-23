@@ -2,23 +2,29 @@
 #
 
 class varnish::params {
-
-  # set Varnish conf location based on OS
+  # set Varnish conf/systemd location based on OS
   case $::osfamily {
     'RedHat': {
       if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
-        $conf_file_path = '/etc/varnish/varnish.params'
+        $systemd            = true
+        $systemctl_bin      = '/usr/bin/systemctl'
+        $varnish_reload_bin = '/usr/sbin/varnish_reload_vcl'
       } else {
+        $systemd = false
         $conf_file_path = '/etc/sysconfig/varnish'
       }
     }
-    default: {
-      $conf_file_path = '/etc/default/varnish'
+    'Debian': {
+      $systemctl_bin      = '/bin/systemctl'
+      $systemd            = false
+      $conf_file_path     = '/etc/default/varnish'
+      $varnish_reload_bin = '/usr/share/varnish/reload-vcl'
     }
-  }
-
-  $version = $varnish::version ? {
-    /4\..*/ => '4',
-    default => $varnish::default_version,
+    default: {
+      $varnish_reload_bin = '/usr/sbin/varnish_reload_vcl'
+      $systemctl_bin      = '/usr/bin/systemctl'
+      $systemd            = false
+      $conf_file_path     = '/etc/default/varnish'
+    }
   }
 }
