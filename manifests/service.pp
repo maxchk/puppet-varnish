@@ -18,11 +18,13 @@
 # }
 
 class varnish::service (
-  $start = 'yes',
+  $start             = 'yes',
+  $systemd           = $::varnish::params::systemd,
+  $systemd_conf_path = $::varnish::params::systemd_conf_path
 ) {
 
   # include install
-  include varnish::install
+  include ::varnish::install
 
   # set state
   $service_state = $start ? {
@@ -61,24 +63,22 @@ class varnish::service (
     onlyif      => $status_command,
   }
 
-  if $::osfamily == 'RedHat' {
-    if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
-
-      file { '/usr/lib/systemd/system/varnish.service':
+  if $systemd {
+      file {  $systemd_conf_path :
         ensure => file,
         source => 'puppet:///modules/varnish/varnish.service',
         notify => Exec['Reload systemd'],
-        before => Service['varnish'],
+        before => [Service['varnish'], Exec['restart-varnish']],
         require => Package['varnish'],
       }
 
       if (!defined(Exec['Reload systemd'])) {
         exec {'Reload systemd':
-          command     => '/usr/bin/systemctl daemon-reload',
+          command     => 'systemctl daemon-reload',
+          path        => ['/bin','/sbin','/usr/bin','/usr/sbin'],
           refreshonly => true,
         }
       }
 
-    }
   }
 }

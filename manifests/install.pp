@@ -34,6 +34,6 @@ class varnish::install (
 
   # varnish package
   package { 'varnish':
-    ensure  => $varnish::version,
+    ensure  => $varnish::package_ensure,
   }
 }
