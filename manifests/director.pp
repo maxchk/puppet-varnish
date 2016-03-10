@@ -6,7 +6,7 @@ define varnish::director(
 
   validate_re($title,'^[A-Za-z0-9_]*$', "Invalid characters in director name ${title}. Only letters, numbers and underscore are allowed.")
 
-  if versioncmp($::varnish::version, '4') >= 0 {
+  if versioncmp($::varnish::varnish_version, '4') >= 0 {
     $template_director = 'varnish/includes/directors4.vcl.erb'
     $director_object = $type ? {
       'round-robin' => 'round_robin',
