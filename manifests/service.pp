@@ -18,9 +18,10 @@
 # }
 
 class varnish::service (
-  $start             = 'yes',
-  $systemd           = $::varnish::params::systemd,
-  $systemd_conf_path = $::varnish::params::systemd_conf_path
+  $start                  = 'yes',
+  $systemd                = $::varnish::params::systemd,
+  $systemd_conf_path      = $::varnish::params::systemd_conf_path,
+  $vcl_reload_script      = $::varnish::params::vcl_reload_script
 ) {
 
   # include install
@@ -66,7 +67,7 @@ class varnish::service (
   if $systemd {
       file {  $systemd_conf_path :
         ensure => file,
-        source => 'puppet:///modules/varnish/varnish.service',
+        content => template('varnish/varnish.service.erb'),
         notify => Exec['Reload systemd'],
         before => [Service['varnish'], Exec['restart-varnish']],
         require => Package['varnish'],
@@ -79,6 +80,5 @@ class varnish::service (
           refreshonly => true,
         }
       }
-
   }
 }
