@@ -70,6 +70,7 @@ class varnish (
   $default_version              = 3,
   $add_repo                     = true,
   $manage_firewall              = false,
+  $varnish_conf_template        = 'varnish/varnish-conf.erb',
 ) {
 
   # read parameters
@@ -102,7 +103,7 @@ class varnish (
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    content => template('varnish/varnish-conf.erb'),
+    content => template($varnish_conf_template),
     require => Package['varnish'],
     notify  => Exec['restart-varnish'],
   }
