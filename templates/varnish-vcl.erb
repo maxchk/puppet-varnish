@@ -116,13 +116,10 @@ sub vcl_recv {
     if (!(client.ip ~ purge)) {
         error 405 "Not allowed.";
     }
-    ban(" req.url == " + req.url);
-    set req.url = regsuball(req.url,"80","443"); 
-    set req.url = regsuball(req.url,"http","https");
-    ban(" req.url == " + req.url);
+    ban("req.http.host == " + req.http.host + " && req.url == " + req.url);
     # Throw a synthetic page so the
     # request won't go to the backend.
-    error 200 "Added ban.";      
+    error 200 "Added ban.";
   }
   <%- end -%>
 
