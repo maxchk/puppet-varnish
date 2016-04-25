@@ -209,7 +209,7 @@
           if (!(req.http.EXCE ~ ";35;")){set req.http.RULE = req.http.RULE + ";35;";}
 	}
 
-	if (req.url ~ "(?i)\.(cvs|svn|git|hg)") 
+	if (req.url ~ "(?i)\.((cvs|svn|git|hg)$)") 
         {
           if (!(req.http.EXCE ~ ";36;")){set req.http.RULE = req.http.RULE + ";36;";}
 	}

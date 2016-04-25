@@ -15,6 +15,9 @@
 #
 # enable_waf - controls VCL WAF component, can be true or false
 #              default value: false
+# pipe_uploads - If the request is a post/put upload (chunked or multipart),
+#                pipe the request to the backend.
+#                default value: false
 #
 #
 #
@@ -28,6 +31,7 @@
 # Not following above rules will result in VCL compilation failure
 #
 class varnish::vcl (
+  $functions         = {},
   $probes            = {},
   $backends          = { 'default' => { host => '127.0.0.1', port => '8080' } },
   $directors         = {},
@@ -37,6 +41,7 @@ class varnish::vcl (
   $blockedips        = [],
   $blockedbots       = [],
   $enable_waf        = false,
+  $pipe_uploads      = false,
   $wafexceptions     = [ '57' , '56' , '34' ],
   $purgeips          = [],
   $includedir        = '/etc/varnish/includes',

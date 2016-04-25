@@ -27,4 +27,5 @@ class varnish::params {
       $conf_file_path     = '/etc/default/varnish'
     }
   }
+
 }

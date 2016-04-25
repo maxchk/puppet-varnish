@@ -1,3 +1,4 @@
   <%- @hosts.each do |host| -%>
-  "<%= host -%>";
+    <%- cidr = host[/\/[0-9]+/] -%>
+      "<%= host[/[^\/]+/] -%>"<%- if cidr -%><%=cidr-%><%end%>;
   <%- end -%>

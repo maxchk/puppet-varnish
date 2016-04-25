@@ -170,6 +170,42 @@ For more details on parameters, check class varnish.
    NOTE: If you copy existing template and modify it you will still  
    be able to use `probes`, `backends`, `directors` and `selectors`.  
 
+## Redefine functions in class varnish::vcl
+
+   With the module comes the basic Varnish vcl configuration file. If needed one can replace default 
+   functions in the configuration file with own ones and/or define custom functions. 
+   Override or custom functions specified in the array passed to `varnish::vcl` class as parameter `functions`.
+   The best way to do it is to use hiera. For example:
+   ```yaml
+   varnish::vcl::functions:
+     vcl_hash: |
+       hash_data(req.url);
+       if (req.http.host) {
+         hash_data(req.http.host);
+       } else {
+         hash_data(server.ip);
+       }
+       return (hash);
+     pipe_if_local: |
+       if (client.ip ~ localnetwork) {
+         return (pipe);
+       }
+   ```
+   There are two special cases for functions `vcl_init` and `vcl_recv`. 
+   For Varnish version 4 in function `vcl_init` include directive for directors is always present.
+   For function `vcl_recv` beside the possibility to override standard function one can also add
+   peace of code to the begining or to the end of the function with special names `vcl_recv_prepend` and `vcl_recv_append`
+   For instance:
+   ```yaml
+   varnish::vcl::functions:
+     pipe_if_local: |
+       if (client.ip ~ localnetwork) {
+         return (pipe);
+       }
+     vcl_recv_prepend: |
+       call pipe_if_local;
+   ```
+
 ## Class varnish ncsa
 
    Class `varnish::ncsa` manages varnishncsa configuration.  
@@ -196,3 +232,4 @@ For more details on parameters, check class varnish.
 - Noel Sharpe <noels@radnetwork.co.uk>
 - Rich Kang <rich@saekang.co.uk>
 - browarrek <browarrek@gmail.com>
+- Stanislav Voroniy <stas@voroniy.com>

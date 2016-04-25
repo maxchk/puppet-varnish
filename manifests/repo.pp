@@ -19,7 +19,8 @@ class varnish::repo (
 
   $repo_version = $varnish::version ? {
     /^3\./  => '3.0',
-    /^4\./  => '4.0',
+    /^4\.0/ => '4.0',
+    /^4\.1/ => '4.1',
     default => '3.0',
   }
 
