@@ -17,6 +17,7 @@ define varnish::probe(
     target  => "${varnish::vcl::includedir}/probes.vcl",
     content => template('varnish/includes/probes.vcl.erb'),
     order   => '02',
+    notify  => Service['varnish'],
   }
 
 }
