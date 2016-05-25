@@ -12,16 +12,19 @@ define varnish::acl(
         target  => "${varnish::vcl::includedir}/acls.vcl",
         content => "acl ${title} {\n",
         order   => "02-${title}-1-0",
+        notify  => Service['varnish'],
       } -> concat::fragment { "${title}-acl_tail":
         target  => "${varnish::vcl::includedir}/acls.vcl",
         content => "}\n",
         order   => "02-${title}-3-0",
+        notify  => Service['varnish'],
       }
     }
     concat::fragment { "${title}-acl_body":
       target  => "${varnish::vcl::includedir}/acls.vcl",
       content => template('varnish/includes/acls_body.vcl.erb'),
       order   => "02-${title}-2-0",
+      notify  => Service['varnish'],
     }
   }
 }
@@ -36,10 +39,12 @@ define varnish::acl_member(
       target  => "${varnish::vcl::includedir}/acls.vcl",
       content => "acl ${acl} {\n",
       order   => "02-${acl}-1-0",
+      notify  => Service['varnish'],
     } -> concat::fragment { "${acl}-acl_tail":
       target  => "${varnish::vcl::includedir}/acls.vcl",
       content => "}\n",
       order   => "02-${acl}-3-0",
+      notify  => Service['varnish'],
     }
   }
   $hosts = [$host]
@@ -47,5 +52,6 @@ define varnish::acl_member(
     target  => "${varnish::vcl::includedir}/acls.vcl",
     content => template('varnish/includes/acls_body.vcl.erb'),
     order   => "02-${acl}-2-${host}",
+    notify  => Service['varnish'],
   }
 }
