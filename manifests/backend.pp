@@ -18,5 +18,6 @@ define varnish::backend(
     target  => "${varnish::vcl::includedir}/backends.vcl",
     content => template('varnish/includes/backends.vcl.erb'),
     order   => '02',
+    notify  => Service['varnish'],
   }
 }

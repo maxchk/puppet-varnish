@@ -98,7 +98,7 @@ sub vcl_recv {
   <%- end -%>
 
   # backend selection logic
-  include "includes/backendselection4.vcl";
+  include "includes/backendselection.vcl";
 
   <%- if @purgeips.length > 0 -%>
   # Allows purge for the IPs in purge ACL
