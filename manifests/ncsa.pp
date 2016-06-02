@@ -1,6 +1,7 @@
 class varnish::ncsa (
   $enable = true,
   $varnishncsa_daemon_opts = undef,
+  $log_format = undef,
 ) {
 
   file { '/etc/default/varnishncsa':
