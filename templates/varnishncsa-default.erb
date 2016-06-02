@@ -14,3 +14,7 @@ VARNISHNCSA_ENABLED=1
 <% if @varnishncsa_daemon_opts -%>
 DAEMON_OPTS="${DAEMON_OPTS} <%= @varnishncsa_daemon_opts %>"
 <% end -%>
+
+<% if @log_format -%>
+VARNISHNCSA_LOGFORMAT="<%= @log_format %>"
+<% end -%>
