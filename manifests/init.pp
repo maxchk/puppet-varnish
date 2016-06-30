@@ -70,6 +70,7 @@ class varnish (
   $add_repo                     = true,
   $manage_firewall              = false,
   $varnish_conf_template        = 'varnish/varnish-conf.erb',
+  $additional_parameters        = {},
 ) {
 
   # read parameters
