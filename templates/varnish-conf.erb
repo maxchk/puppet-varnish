@@ -102,6 +102,7 @@ DAEMON_OPTS="-a <%= scope.lookupvar('varnish_listen_address') %>:<%= scope.looku
 <% end -%>
 <% @additional_parameters.each do |param, value| -%>
              -p <%= param %>=<%= value %> \
+<% end -%>
 <% @additional_storages.each do |name,storage| -%>
              -s <%= name %>=<%= storage %> \
 <% end -%>
