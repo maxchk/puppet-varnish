@@ -70,6 +70,7 @@ class varnish (
   $add_repo                     = true,
   $manage_firewall              = false,
   $varnish_conf_template        = 'varnish/varnish-conf.erb',
+  $additional_parameters        = {},
   $conf_file_path               = $varnish::params::conf_file_path,
   $systemd                      = $varnish::params::systemd,
   $systemctl_bin                = $varnish::params::systemctl_bin,

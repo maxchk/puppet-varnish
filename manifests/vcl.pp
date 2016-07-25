@@ -96,6 +96,8 @@ class varnish::vcl (
   if $template == undef or $manage_includes {
     file { $includedir:
       ensure  => directory,
+      purge   => true,
+      recurse => true,
       require => Package['varnish'],
     }
     $includefiles = ['probes', 'backends', 'directors', 'acls', 'backendselection', 'waf']
