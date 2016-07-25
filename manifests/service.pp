@@ -19,6 +19,7 @@
 
 class varnish::service (
   $start = 'yes',
+  $systemctl_bin = $::varnish::systemctl_bin,
 ) {
 
   # include install
@@ -66,24 +67,22 @@ class varnish::service (
     onlyif      => $status_command,
   }
 
-  if $::osfamily == 'RedHat' {
-    if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
+  if $varnish::systemd {
 
-      file { '/usr/lib/systemd/system/varnish.service':
+      file { '/etc/systemd/system/varnish.service':
         ensure => file,
-        source => 'puppet:///modules/varnish/varnish.service',
+        content => template('varnish/varnish-service.erb'),
         notify => Exec['Reload systemd'],
-        before => Service['varnish'],
         require => Package['varnish'],
       }
 
       if (!defined(Exec['Reload systemd'])) {
         exec {'Reload systemd':
-          command     => '/usr/bin/systemctl daemon-reload',
+          command     => "${systemctl_bin} daemon-reload",
           refreshonly => true,
+          notify      => Exec['restart-varnish'],
         }
       }
 
-    }
   }
 }

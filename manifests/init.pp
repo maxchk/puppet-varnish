@@ -71,10 +71,21 @@ class varnish (
   $manage_firewall              = false,
   $varnish_conf_template        = 'varnish/varnish-conf.erb',
   $additional_parameters        = {},
-) {
+  $conf_file_path               = $varnish::params::conf_file_path,
+  $systemd                      = $varnish::params::systemd,
+  $systemctl_bin                = $varnish::params::systemctl_bin,
+  $varnish_reload_bin           = $varnish::params::varnish_reload_bin
+) inherits varnish::params {
 
-  # read parameters
-  include varnish::params
+  $conf_file = $systemd ? {
+    true => '/etc/varnish/varnish.params',
+    default => $conf_file_path,
+  }
+
+  $varnish_version = $version ? {
+    /4\..*/ => '4',
+    default => $default_version,
+  }
 
   # install Varnish
   class {'varnish::install':
@@ -99,7 +110,7 @@ class varnish (
   # varnish config file
   file { 'varnish-conf':
     ensure  => present,
-    path    => $varnish::params::conf_file_path,
+    path    => $conf_file,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',

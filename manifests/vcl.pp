@@ -87,22 +87,10 @@ class varnish::vcl (
     $template_vcl = $template
   }
   else {
-    $template_vcl = $::varnish::params::version ? {
+    $template_vcl = $::varnish::varnish_version ? {
       '4'     => 'varnish/varnish4-vcl.erb',
       default => 'varnish/varnish-vcl.erb',
     }
-  }
-
-  # vcl file
-  file { 'varnish-vcl':
-    ensure  => present,
-    path    => $varnish::varnish_vcl_conf,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    content => template($template_vcl),
-    notify  => Service['varnish'],
-    require => Package['varnish'],
   }
 
   if $template == undef or $manage_includes {
@@ -114,7 +102,7 @@ class varnish::vcl (
     }
     $includefiles = ['probes', 'backends', 'directors', 'acls', 'backendselection', 'waf']
 
-    varnish::vcl::includefile { $includefiles: }
+    varnish::vcl::includefile { $includefiles: before => File['varnish-vcl'], }
 
     # web application firewall
     concat::fragment { 'waf':
@@ -151,4 +139,17 @@ class varnish::vcl (
     create_resources(varnish::acl,$all_acls)
     Varnish::Acl_member <| varnish_fqdn == $::fqdn |>
   }
+
+  # vcl file
+  file { 'varnish-vcl':
+    ensure  => present,
+    path    => $varnish::varnish_vcl_conf,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => template($template_vcl),
+    notify  => Service['varnish'],
+    require => File['varnish-conf'],
+  }
+
 }
