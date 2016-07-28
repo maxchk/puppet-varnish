@@ -73,6 +73,7 @@ class varnish (
   $add_repo                     = true,
   $manage_firewall              = false,
   $varnish_conf_template        = 'varnish/varnish-conf.erb',
+  $varnish_identity             = undef,
   $additional_parameters        = {},
   $additional_storages          = {},
 ) {
