@@ -7,6 +7,7 @@ group :development, :test do
   gem 'puppet-lint',             :require => false
   gem 'pry',                     :require => false
   gem 'simplecov',               :require => false
+  gem 'metadata-json-lint',     :require => false
 end
 
 if puppetversion = ENV['PUPPET_GEM_VERSION']
