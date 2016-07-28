@@ -85,16 +85,13 @@ class varnish::vcl (
     }
   }
 
-
   # select template to use
   if $template {
     $template_vcl = $template
-  }
-  else {
-    $template_vcl = $::varnish::params::version ? {
-      '4'     => 'varnish/varnish4-vcl.erb',
-      default => 'varnish/varnish-vcl.erb',
-    }
+  } elsif versioncmp($::varnish::real_version, '4') >= 0 {
+    $template_vcl = 'varnish/varnish4-vcl.erb'
+  } else {
+    $template_vcl = 'varnish/varnish-vcl.erb'
   }
 
   # vcl file

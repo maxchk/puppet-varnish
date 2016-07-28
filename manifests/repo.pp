@@ -17,13 +17,6 @@ class varnish::repo (
     default     => downcase($::operatingsystem),
   }
 
-  $repo_version = $varnish::version ? {
-    /^3\./  => '3.0',
-    /^4\.0/ => '4.0',
-    /^4\.1/ => '4.1',
-    default => '3.0',
-  }
-
   $repo_arch = $::architecture
 
   $osver_array = split($::operatingsystemrelease, '[.]')
@@ -45,13 +38,13 @@ class varnish::repo (
           enabled  => '1',
           gpgcheck => '0',
           priority => '1',
-          baseurl  => "${repo_base_url}/${repo_distro}/varnish-${repo_version}/el${osver}/${repo_arch}",
+          baseurl  => "${repo_base_url}/${repo_distro}/varnish-${varnish::real_version}/el${osver}/${repo_arch}",
         }
       }
       debian: {
         apt::source { 'varnish':
           location   => "${repo_base_url}/${repo_distro}",
-          repos      => "varnish-${repo_version}",
+          repos      => "varnish-${varnish::real_version}",
           key        => 'E98C6BBBA1CBC5C3EB2DF21C60E7C096C4DEFFEB',
           key_source => 'http://repo.varnish-cache.org/debian/GPG-key.txt',
         }
