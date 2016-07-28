@@ -122,6 +122,7 @@ class varnish::vcl (
       target  => "${varnish::vcl::includedir}/waf.vcl",
       content => template('varnish/includes/waf.vcl.erb'),
       order   => '02',
+      notify  => Service['varnish'],
     }
 
     #Create resources
