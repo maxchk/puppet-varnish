@@ -59,9 +59,13 @@ class varnish::vcl (
   $https_redirect    = false,
   $drop_stat_cookies = true,
   $cond_unset_cookies = undef,
+  $unset_headers     = ['Via','X-Powered-By','X-Varnish','Server','Age','X-Cache'],
+  $unset_headers_debugips = [ '172.0.0.1' ],
 ) {
 
-  include varnish
+  include ::varnish
+  validate_array($unset_headers)
+  validate_array($unset_headers_debugips)
 
   # define include file type
   define includefile {
@@ -145,6 +149,7 @@ class varnish::vcl (
     validate_hash($acls)
     $default_acls = {
       blockedips => { hosts => $blockedips },
+      unset_headers_debugips => { hosts => $unset_headers_debugips },
       purge => { hosts => $purgeips },
     }
     $all_acls = merge($default_acls, $acls)

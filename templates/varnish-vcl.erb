@@ -258,6 +258,19 @@ sub vcl_deliver {
      } else {
          set resp.http.X-Cache = "MISS";
      }
+     
+  <%- if @unset_headers.length > 0 -%>
+  <%- if @unset_headers_debugips.length > 0 -%>
+  if(!client.ip ~ unset_headers_debugips) {
+  <%-end-%>
+	  # Unset Headers from
+	  <%- @unset_headers.each do |unseth| -%>
+	  unset resp.http.<%= unseth %>;
+	  <%-end-%>
+  <%- if @unset_headers_debugips.length > 0 -%>
+  }
+  <%-end-%>
+  <%-end-%>
 <%- end -%>
 }
 
