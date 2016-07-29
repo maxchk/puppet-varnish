@@ -76,6 +76,7 @@ class varnish (
   $varnish_identity             = undef,
   $additional_parameters        = {},
   $additional_storages          = {},
+  $conf_file_path               = $::varnish::params::conf_file_path,
 ) {
 
   # read parameters
