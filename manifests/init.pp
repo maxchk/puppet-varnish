@@ -120,7 +120,7 @@ class varnish (
   # varnish config file
   file { 'varnish-conf':
     ensure  => present,
-    path    => $varnish::params::conf_file_path,
+    path    => $conf_file_path,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
