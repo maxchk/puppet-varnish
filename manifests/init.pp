@@ -76,6 +76,7 @@ class varnish (
   $varnish_identity             = undef,
   $additional_parameters        = {},
   $additional_storages          = {},
+  $conf_file_path               = $::varnish::params::conf_file_path,
 ) {
 
   # read parameters
@@ -119,7 +120,7 @@ class varnish (
   # varnish config file
   file { 'varnish-conf':
     ensure  => present,
-    path    => $varnish::params::conf_file_path,
+    path    => $conf_file_path,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
