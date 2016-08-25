@@ -66,9 +66,8 @@ VARNISH_THREAD_TIMEOUT=<%= scope.lookupvar('varnish_thread_timeout') %>
 # # Cache file location
 VARNISH_STORAGE_FILE=<%= scope.lookupvar('varnish_storage_file') %>
 #
-# # Cache file size: in bytes, optionally using k / M / G / T suffix,
-# # or in percentage of available disk space using the % suffix.
-VARNISH_STORAGE_SIZE=<%= scope.lookupvar('varnish_storage_size') %>
+# # Cache file size: in bytes, optionally using k / M / G / T suffix.
+VARNISH_STORAGE_SIZE=<%= scope.lookupvar('varnish_actual_storage_size') %>
 #
 # # File containing administration secret
 VARNISH_SECRET_FILE=<%= scope.lookupvar('varnish_secret_file') %>
@@ -96,9 +95,9 @@ DAEMON_OPTS="-a <%= scope.lookupvar('varnish_listen_address') %>:<%= scope.looku
              -t <%= scope.lookupvar('varnish_ttl') %> \
              -S <%= scope.lookupvar('varnish_secret_file') %> \
 <% if scope.lookupvar('storage_type') == 'malloc' -%>
-             -s <%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_size') %> \
+             -s <%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_actual_storage_size') %> \
 <% else -%>
-             -s <%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_file') %>,<%= scope.lookupvar('varnish_storage_size') %> \
+             -s <%= scope.lookupvar('storage_type') %>,<%= scope.lookupvar('varnish_storage_file') %>,<%= scope.lookupvar('varnish_actual_storage_size') %> \
 <% end -%>
 <% if @vcl_dir -%>
              -p vcl_dir=<%= @vcl_dir %> \
