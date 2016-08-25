@@ -97,6 +97,25 @@ class varnish (
     $real_version = $version
   }
 
+  case $varnish_storage_size {
+    /%$/: {
+      case $storage_type {
+        'malloc': {
+          $varnish_storage_size_percentage = scanf($varnish_storage_size, "%f%%")
+          $varnish_actual_storage_size = sprintf("%dM", floor($::memorysize_mb * $varnish_storage_size_percentage[0]))
+        }
+
+        default: {
+          fail("A percentage-based storage size can only be specified if using 'malloc' storage")
+        }
+      }
+    }
+
+    default: {
+      $varnish_actual_storage_size = $varnish_storage_size
+    }
+  }
+
   # install Varnish
   class {'varnish::install':
     add_repo            => $add_repo,
