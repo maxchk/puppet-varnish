@@ -20,7 +20,7 @@ class varnish::params {
     }
     'Debian': {
       $vcl_reload_script = '/usr/share/varnish/reload-vcl'
-      if ($::operatingsystem == 'Ubuntu' and versioncmp($::operatingsystemmajrelease, '15.10')) {
+      if ($::operatingsystem == 'Ubuntu' and versioncmp($::operatingsystemmajrelease, '15.10') > 0) {
         #don't add repo as in default repo
         $add_repo = false
         $systemd_conf_path = '/lib/systemd/system/varnish.service'
