@@ -32,19 +32,11 @@ class varnish::params {
         $systemd = false
         $conf_file_path = '/etc/default/varnish'
         $default_version = '3'
-        
+
       }
     }
     default: {
       fail("Class['apache::params']: Unsupported osfamily: ${::osfamily}")
     }
-  }
-  $real_version = $::varnish::version ? {
-    /^(3|4).*/ => $::varnish::version,
-    default => $default_version,
-  }
-  $version = $real_version ? {
-    /4\..*/ => '4',
-    default => 3,
   }
 }
