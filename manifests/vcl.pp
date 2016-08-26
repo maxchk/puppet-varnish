@@ -227,5 +227,10 @@ class varnish::vcl (
     purge => { hosts => $purgeips },
   } 
   $all_acls = merge($default_acls, $acls)
+  concat {
+    "${varnish::vcl::includedir}/acls.vcl":
+      ensure => present,
+  }
+ 
   create_resources(varnish::acl,$all_acls) 
 }
