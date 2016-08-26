@@ -160,6 +160,11 @@ class varnish::vcl (
   }
 
   # web application firewall
+  concat {
+    "${varnish::vcl::includedir}/waf.vcl":
+      ensure => present,
+  }
+
   concat::fragment { "waf":
     target => "${varnish::vcl::includedir}/waf.vcl",
     content => template('varnish/includes/waf.vcl.erb'),
@@ -189,6 +194,10 @@ class varnish::vcl (
     order => '02',
   }
   create_resources(varnish::selector,$selectors)
+  concat {
+    "${varnish::vcl::includedir}/backendselection.vcl":
+      ensure => present,
+  }
   concat::fragment { "selectors-footer":
     target => "${varnish::vcl::includedir}/backendselection.vcl",
     content => '} else {
