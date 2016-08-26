@@ -175,14 +175,26 @@ class varnish::vcl (
  
   #Backends
   validate_hash($backends)
+  concat {
+    "${varnish::vcl::includedir}/backends.vcl":
+      ensure => present,
+  }
   create_resources(varnish::backend,$backends) 
 
   #Probes
   validate_hash($probes)
+  concat {
+    "${varnish::vcl::includedir}/probes.vcl":
+      ensure => present,
+  }
   create_resources(varnish::probe,$probes) 
   
   #Directors
   validate_hash($directors)
+  concat {
+    "${varnish::vcl::includedir}/directors.vcl":
+      ensure => present,
+  }
   create_resources(varnish::director,$directors)
 
   #Selectors
@@ -194,6 +206,7 @@ class varnish::vcl (
     order => '02',
   }
   create_resources(varnish::selector,$selectors)
+
   concat {
     "${varnish::vcl::includedir}/backendselection.vcl":
       ensure => present,

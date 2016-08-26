@@ -11,11 +11,6 @@ define varnish::backend ( $host,
     fail("Backend host $host is not an IP Address!")
   }
 
-  concat { 
-    "${varnish::vcl::includedir}/backends.vcl":
-      ensure => $ensure,
-  }
-
   concat::fragment { "$title-backend":
     target => "${varnish::vcl::includedir}/backends.vcl",
     content => template('varnish/includes/backends.vcl.erb'),
