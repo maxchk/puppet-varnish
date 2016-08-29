@@ -12,6 +12,11 @@ define varnish::probe ( $interval  = '5s',
   # parameters for probe
   $probe_params = [ 'interval', 'timeout', 'threshold', 'window', 'url', 'request' ]
 
+  concat {
+    "${varnish::vcl::includedir}/probes.vcl":
+      ensure => present,
+  }
+
   concat::fragment { "$title-probe":
     target => "${varnish::vcl::includedir}/probes.vcl",
     content => template('varnish/includes/probes.vcl.erb'),

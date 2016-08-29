@@ -160,6 +160,11 @@ class varnish::vcl (
   }
 
   # web application firewall
+  concat {
+    "${varnish::vcl::includedir}/waf.vcl":
+      ensure => present,
+  }
+
   concat::fragment { "waf":
     target => "${varnish::vcl::includedir}/waf.vcl",
     content => template('varnish/includes/waf.vcl.erb'),
@@ -170,14 +175,26 @@ class varnish::vcl (
  
   #Backends
   validate_hash($backends)
+  concat {
+    "${varnish::vcl::includedir}/backends.vcl":
+      ensure => present,
+  }
   create_resources(varnish::backend,$backends) 
 
   #Probes
   validate_hash($probes)
+  concat {
+    "${varnish::vcl::includedir}/probes.vcl":
+      ensure => present,
+  }
   create_resources(varnish::probe,$probes) 
   
   #Directors
   validate_hash($directors)
+  concat {
+    "${varnish::vcl::includedir}/directors.vcl":
+      ensure => present,
+  }
   create_resources(varnish::director,$directors)
 
   #Selectors
@@ -189,6 +206,11 @@ class varnish::vcl (
     order => '02',
   }
   create_resources(varnish::selector,$selectors)
+
+  concat {
+    "${varnish::vcl::includedir}/backendselection.vcl":
+      ensure => present,
+  }
   concat::fragment { "selectors-footer":
     target => "${varnish::vcl::includedir}/backendselection.vcl",
     content => '} else {
@@ -205,5 +227,10 @@ class varnish::vcl (
     purge => { hosts => $purgeips },
   } 
   $all_acls = merge($default_acls, $acls)
+  concat {
+    "${varnish::vcl::includedir}/acls.vcl":
+      ensure => present,
+  }
+ 
   create_resources(varnish::acl,$all_acls) 
 }
