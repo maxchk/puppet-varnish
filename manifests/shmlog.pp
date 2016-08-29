@@ -38,7 +38,7 @@ class varnish::shmlog (
     target  => '/etc/fstab',
     fstype  => 'tmpfs',
     device  => 'tmpfs',
-    options => 'defaults,noatime,size=128M',
+    options => 'defaults,noatime,size=256M',
     pass    => '0',
     dump    => '0',
     require => File['shmlog-dir'],
