@@ -75,7 +75,10 @@ class varnish::vcl (
       group   => 'root',
       mode    => '0444',
       notify  => Service['varnish'],
-      require => File[$varnish::vcl::includedir],
+      require => [
+        File[$varnish::vcl::includedir],
+        Package['varnish'],
+      ],
     }
 
     concat::fragment { "${title}-header":
