@@ -36,6 +36,7 @@ class varnish::ncsa (
     group   => 'root',
     content => template('varnish/varnishncsa-default.erb'),
     notify  => Service['varnishncsa'],
+    require => Package['varnish'],
   }
 
   $service_ensure = $enable ? {
