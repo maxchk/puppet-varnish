@@ -2,6 +2,7 @@
 define varnish::backend(
   $host,
   $port,
+  $max_connections       = undef,
   $probe                 = undef,
   $connect_timeout       = undef,
   $first_byte_timeout    = undef,
