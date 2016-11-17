@@ -89,7 +89,7 @@ VARNISH_TTL=<%= scope.lookupvar('varnish_ttl') %>
 DAEMON_OPTS="-a <%= scope.lookupvar('varnish_listen_address') %>:<%= scope.lookupvar('varnish_listen_port') %> \
              -f <%= scope.lookupvar('varnish_vcl_conf') %> \
 <% if @varnish_identity -%>
-             -i "<%= @varnish_identity %>" \
+             -i <%= @varnish_identity %> \
 <% end -%>
              -T <%= scope.lookupvar('varnish_admin_listen_address') %>:<%= scope.lookupvar('varnish_admin_listen_port') %> \
              -t <%= scope.lookupvar('varnish_ttl') %> \
