@@ -40,6 +40,12 @@ class varnish::params {
         $default_version = '3'
 
       }
+      if ($::operatingsystem == 'Debian' and versioncmp($::operatingsystemmajrelease, '7') > 0) {
+        #don't add repo as in default repo
+        $add_repo = false
+        $conf_file_path = '/etc/default/varnish'
+        $default_version ='4'
+      }
     }
     default: {
       fail("Class['apache::params']: Unsupported osfamily: ${::osfamily}")
