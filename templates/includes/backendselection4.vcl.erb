@@ -2,11 +2,7 @@ if (<%= @condition -%>) {
     <%- if @movedto -%>
   synth( 750, "<%= @movedto -%>" + req.url);
     <%- else -%>
-      <%- if @backend %>
-  set req.backend_hint = <%= @backend -%>;
-      <%- else -%>
-  set req.backend_hint = <%= @director -%>.backend();
-      <%- end -%>
+  set req.backend_hint = <%= @_backend -%>;
       <%- if @rewrite -%>
   set req.http.x-host = <%= @rewrite -%>;
       <%- end -%>

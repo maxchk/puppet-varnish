@@ -2,7 +2,7 @@
 define varnish::selector(
   $condition,
   $director = $name,
-  $backend = $undef,
+  $backend = undef,
   $rewrite = undef,
   $newurl = undef,
   $movedto = undef,
@@ -11,6 +11,12 @@ define varnish::selector(
     $template_selector = 'varnish/includes/backendselection4.vcl.erb'
   } else {
     $template_selector = 'varnish/includes/backendselection.vcl.erb'
+  }
+
+  if $backend {
+    $_backend = $backend
+  } else {
+    $_backend = "${director}.backend()"
   }
 
   concat::fragment { "${title}-selector":
