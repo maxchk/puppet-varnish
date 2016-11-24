@@ -9,7 +9,12 @@ PIDFile=/run/varnishncsa/varnishncsa.pid
 EnvironmentFile=/etc/default/varnishncsa
 User=varnishlog
 Group=varnish
-ExecStart=/usr/bin/varnishncsa -a $DAEMON_OPTS -D -P /run/varnishncsa/varnishncsa.pid
+ExecStart=/usr/bin/varnishncsa -a -D -P /run/varnishncsa/varnishncsa.pid <%-
+  if @varnishncsa_daemon_opts -%>
+<%= @varnishncsa_daemon_opts -%>
+  <%- end -%>
+  <% if @log_format %> -f <%= @log_format %> <% end %>
+
 ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]

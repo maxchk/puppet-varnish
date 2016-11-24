@@ -57,9 +57,9 @@ class varnish::ncsa (
 
   if $systemd {
     file { $systemd_conf_path:
-      ensure => 'file',
-      source => 'puppet:///modules/varnish/varnishncsa.service',
-      notify => [
+      ensure  => 'file',
+      content => template('varnish/varnishncsa.service'),
+      notify  => [
         Exec['Reload systemd'],
         Service['varnishncsa'],
       ],

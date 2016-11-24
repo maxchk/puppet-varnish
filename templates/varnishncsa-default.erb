@@ -11,9 +11,11 @@ VARNISHNCSA_ENABLED=1
 # VARNISHNCSA_ENABLED=1
 <% end -%>
 
-
-DAEMON_OPTS="<% if @varnishncsa_daemon_opts -%><%= @varnishncsa_daemon_opts %> \
+<% if @varnishncsa_daemon_opts -%>
+DAEMON_OPTS="${DAEMON_OPTS} <%= @varnishncsa_daemon_opts %>"
 <% end -%>
+
 <% if @log_format -%>
-            -f <%= @log_format_file %> \
-<% end -%>"
+# Custom output format.
+DAEMON_OPTS="${DAEMON_OPTS} -f <%= @log_format_file %>"
+<% end -%>
