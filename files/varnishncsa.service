@@ -1,0 +1,16 @@
+[Unit]
+Description=Varnish Cache HTTP accelerator NCSA logging daemon
+After=varnish.service
+
+[Service]
+RuntimeDirectory=varnishncsa
+Type=forking
+PIDFile=/run/varnishncsa/varnishncsa.pid
+EnvironmentFile=/etc/default/varnishncsa
+User=varnishlog
+Group=varnish
+ExecStart=/usr/bin/varnishncsa -a $DAEMON_OPTS -D -P /run/varnishncsa/varnishncsa.pid
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
