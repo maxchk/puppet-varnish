@@ -74,6 +74,7 @@ class varnish (
   $manage_firewall              = false,
   $varnish_conf_template        = 'varnish/varnish-conf.erb',
   $varnish_identity             = undef,
+  $varnish_name                 = undef,
   $additional_parameters        = {},
   $additional_storages          = {},
   $conf_file_path               = $varnish::params::conf_file_path,
