@@ -108,6 +108,9 @@ DAEMON_OPTS="-a <%= scope.lookupvar('varnish_listen_address') %>:<%= scope.looku
 <% @additional_storages.each do |name,storage| -%>
              -s <%= name %>=<%= storage %> \
 <% end -%>
+<% if @varnish_name -%>
+             -n <%= @varnish_name %> \
+<% end -%>
 <% if scope.function_versioncmp([@real_version, '4']) >= 0 -%>
              -p thread_pool_min=<%= scope.lookupvar('varnish_min_threads') %> \
              -p thread_pool_max=<%= scope.lookupvar('varnish_max_threads') %> \
@@ -115,5 +118,6 @@ DAEMON_OPTS="-a <%= scope.lookupvar('varnish_listen_address') %>:<%= scope.looku
 <% else -%>
              -w <%= scope.lookupvar('varnish_min_threads') %>,<%= scope.lookupvar('varnish_max_threads') %>,<%= scope.lookupvar('varnish_thread_timeout') %>"
 <% end -%>
+
 
 
