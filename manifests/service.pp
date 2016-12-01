@@ -60,20 +60,14 @@ class varnish::service (
   }
 
   if $systemd {
+    include ::varnish::systemd
+
     file {  $systemd_conf_path :
       ensure => file,
       content => template('varnish/varnish.service.erb'),
       notify => Exec['Reload systemd'],
       before => [Service['varnish'], Exec['restart-varnish']],
       require => Package['varnish'],
-    }
-
-    if (!defined(Exec['Reload systemd'])) {
-      exec {'Reload systemd':
-        command     => 'systemctl daemon-reload',
-        path        => ['/bin','/sbin','/usr/bin','/usr/sbin'],
-        refreshonly => true,
-      }
     }
   }
 }

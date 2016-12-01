@@ -6,8 +6,6 @@ class varnish::ncsa (
   $systemd_conf_path  = $varnish::params::systemd_ncsa_conf_path,
 ) {
 
-  include varnish::service
-
   $log_format_file = '/etc/varnish/ncsa-format'
 
   # TODO: We should raise an error if a custom log format is specified when
@@ -56,6 +54,8 @@ class varnish::ncsa (
   }
 
   if $systemd {
+    include ::varnish::systemd
+
     file { $systemd_conf_path:
       ensure  => 'file',
       content => template('varnish/varnishncsa.service.erb'),
