@@ -29,23 +29,22 @@ class varnish::params {
         $systemd = true
         $systemd_conf_path = '/etc/systemd/system/varnish.service'
         $systemd_ncsa_conf_path = '/etc/systemd/system/varnishncsa.service'
+        $conf_file_path = '/etc/varnish/varnish.params'
       } else {
         $systemd = false
+        $conf_file_path = '/etc/default/varnish'
       }
       if ($::operatingsystem == 'Ubuntu' and versioncmp($::operatingsystemmajrelease, '15.10') > 0) {
         #don't add repo as in default repo
         $add_repo = false
-        $conf_file_path = '/etc/varnish/varnish.params'
         $default_version ='4'
       } elsif ($::operatingsystem == 'Debian' and versioncmp($::operatingsystemmajrelease, '7') > 0) {
         #don't add repo as in default repo
         $add_repo = false
-        $conf_file_path = '/etc/default/varnish'
         $default_version ='4'
       }
       else {
         $add_repo = true
-        $conf_file_path = '/etc/default/varnish'
         $default_version = '3'
 
       }
