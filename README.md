@@ -76,7 +76,7 @@ For more details on parameters, check class varnish.
 
     varnish::acl { 'acl1': hosts => [ "localhost", "172.16.0.1" ] }
 
-### varnish acl_membr
+### varnish acl_member
 
    Definition `varnish::acl_member` allows to export member resources to be included in configuration of Varnish acl.
 
