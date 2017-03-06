@@ -6,6 +6,7 @@ define varnish::selector(
   $rewrite = undef,
   $newurl = undef,
   $movedto = undef,
+  $order = 10,
 ) {
   if versioncmp($::varnish::real_version, '4') >= 0 {
     $template_selector = 'varnish/includes/backendselection4.vcl.erb'
@@ -22,7 +23,7 @@ define varnish::selector(
   concat::fragment { "${title}-selector":
     target  => "${varnish::vcl::includedir}/backendselection.vcl",
     content => template($template_selector),
-    order   => '03',
+    order   => $order,
     notify  => Service['varnish'],
   }
 
