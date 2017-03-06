@@ -65,10 +65,14 @@ describe 'varnish::selector', :type => :define do
       let(:params) { super().merge(:backend => 'backend01') }
 
       it { is_expected.to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.backend_hint = #{Regexp.escape params[:backend]};$/) }
+      it { is_expected.to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.http.x-backend = "#{Regexp.escape params[:backend]}";$/) }
+      it { is_expected.not_to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.http.x-director =/) }
     end
 
     context 'with director' do
       it { is_expected.to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.backend_hint = #{Regexp.escape title}\.backend\(\);$/) }
+      it { is_expected.not_to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.http.x-backend =/) }
+      it { is_expected.to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.http.x-director = "#{Regexp.escape title}";$/) }
     end
   end
 
@@ -89,10 +93,14 @@ describe 'varnish::selector', :type => :define do
       let(:params) { super().merge(:backend => 'backend01') }
 
       it { is_expected.to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.backend_hint = #{Regexp.escape params[:backend]};$/) }
+      it { is_expected.to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.http.x-backend = "#{Regexp.escape params[:backend]}";$/) }
+      it { is_expected.not_to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.http.x-director =/) }
     end
 
     context 'with director' do
       it { is_expected.to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.backend_hint = #{Regexp.escape title}\.backend\(\);$/) }
+      it { is_expected.not_to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.http.x-backend =/) }
+      it { is_expected.to contain_concat__fragment("#{title}-selector").with_content(/^  set req\.http.x-director = "#{Regexp.escape title}";$/) }
     end
   end
 
