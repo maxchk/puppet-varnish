@@ -7,17 +7,18 @@ class varnish::repo (
   $enable = true,
   ) {
 
-  $repo_base_url = 'http://repo.varnish-cache.org'
+  $repo_base_url = 'https://packagecloud.io'
 
   $repo_distro = $::operatingsystem ? {
-    'RedHat'    => 'redhat',
+    'RedHat'    => 'el',
     'LinuxMint' => 'ubuntu',
-    'centos'    => 'redhat',
-    'amazon'    => 'redhat',
+    'centos'    => 'el',
+    'amazon'    => 'el',
     default     => downcase($::operatingsystem),
   }
 
   $repo_arch = $::architecture
+  $repo_version = regsubst($varnish::real_version, '^(\d+)\.(\d+)$', '\1\2')
 
   $osver_array = split($::operatingsystemrelease, '[.]')
   if downcase($::operatingsystem) == 'amazon' {
@@ -36,18 +37,32 @@ class varnish::repo (
         yumrepo { 'varnish':
           descr    => 'varnish',
           enabled  => '1',
-          gpgcheck => '0',
+          gpgcheck => '1',
+          gpgkey   => "$repo_base_url/varnishcache/varnish${$repo_version}/gpgkey",
           priority => '1',
-          baseurl  => "${repo_base_url}/${repo_distro}/varnish-${varnish::real_version}/el${osver}/${repo_arch}",
+          baseurl  => "${repo_base_url}/varnishcache/varnish${repo_version}/${repo_distro}/${osver}/$basearch",
         }
       }
+      
       debian: {
+        case $repo_version {
+	  '30': {
+	    $key_id = "246BE381150865E2DC8C6B01FC1318ACEE2C594C"
+	  }
+	  '40': {
+	    $key_id = "B7B16293AE0CC24216E9A83DD4E49AD8DE3FFEA4"
+	  }
+	  '41': {
+	    $key_id = "9C96F9CA0DC3F4EA78FF332834BF6E8ECBF5C49E"
+	  }
+	}
+
         apt::source { 'varnish':
-          location   => "${repo_base_url}/${repo_distro}",
-          repos      => "varnish-${varnish::real_version}",
+          location   => "${repo_base_url}/varnishcache/varnish${repo_version}/${repo_distro}",
+          repos      => "main",
           key        => {
-            id => 'E98C6BBBA1CBC5C3EB2DF21C60E7C096C4DEFFEB',
-            source => 'http://repo.varnish-cache.org/debian/GPG-key.txt',
+            id     => $key_id,
+            source => "$repo_base_url/varnishcache/varnish${$repo_version}/gpgkey"
           },
         }
       }
