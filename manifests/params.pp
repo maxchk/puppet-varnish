@@ -6,7 +6,7 @@ class varnish::params {
   # set Varnish conf location based on OS
   case $::osfamily {
     'RedHat': {
-      $default_version = '3'
+      $default_version = '3.0'
       $add_repo = true
       $vcl_reload_script = '/usr/sbin/varnish_reload_vcl'
       if ($::service_provider == 'systemd') {
@@ -37,15 +37,15 @@ class varnish::params {
       if ($::operatingsystem == 'Ubuntu' and versioncmp($::operatingsystemmajrelease, '15.10') > 0) {
         #don't add repo as in default repo
         $add_repo = false
-        $default_version ='4'
+        $default_version ='4.1'
       } elsif ($::operatingsystem == 'Debian' and versioncmp($::operatingsystemmajrelease, '7') > 0) {
         #don't add repo as in default repo
         $add_repo = false
-        $default_version ='4'
+        $default_version ='4.1'
       }
       else {
         $add_repo = true
-        $default_version = '3'
+        $default_version = '3.0'
 
       }
     }
