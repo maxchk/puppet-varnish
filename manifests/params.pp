@@ -24,7 +24,7 @@ class varnish::params {
     'Debian': {
       $vcl_reload_script = '/usr/share/varnish/reload-vcl'
       if ($::service_provider == 'systemd' or
-          ($::operatingsystem == 'Ubuntu' and 
+          ($::operatingsystem == 'Ubuntu' and
           versioncmp($::operatingsystemmajrelease, '15.10') > 0)) {
         $systemd = true
         $systemd_conf_path = '/etc/systemd/system/varnish.service'
