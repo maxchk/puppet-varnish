@@ -12,8 +12,11 @@ class varnish::params {
       if ($::service_provider == 'systemd') {
         $systemd = true
         $systemd_conf_path = '/usr/lib/systemd/system/varnish.service'
+        $systemd_ncsa_conf_path = undef
       } else {
         $systemd = false
+        $systemd_conf_path = undef
+        $systemd_ncsa_conf_path = undef
       }
       if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
         $conf_file_path = '/etc/varnish/varnish.params'
@@ -24,7 +27,7 @@ class varnish::params {
     'Debian': {
       $vcl_reload_script = '/usr/share/varnish/reload-vcl'
       if ($::service_provider == 'systemd' or
-          ($::operatingsystem == 'Ubuntu' and 
+          ($::operatingsystem == 'Ubuntu' and
           versioncmp($::operatingsystemmajrelease, '15.10') > 0)) {
         $systemd = true
         $systemd_conf_path = '/etc/systemd/system/varnish.service'
@@ -32,6 +35,8 @@ class varnish::params {
         $conf_file_path = '/etc/varnish/varnish.params'
       } else {
         $systemd = false
+        $systemd_conf_path = undef
+        $systemd_ncsa_conf_path = undef
         $conf_file_path = '/etc/default/varnish'
       }
       if ($::operatingsystem == 'Ubuntu' and versioncmp($::operatingsystemmajrelease, '15.10') > 0) {
