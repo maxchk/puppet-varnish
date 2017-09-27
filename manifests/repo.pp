@@ -40,7 +40,7 @@ class varnish::repo (
           gpgcheck => '1',
           gpgkey   => "$repo_base_url/varnishcache/varnish${$repo_version}/gpgkey",
           priority => '1',
-          baseurl  => "${repo_base_url}/varnishcache/varnish${repo_version}/${repo_distro}/${osver}/$basearch",
+          baseurl  => "${repo_base_url}/varnishcache/varnish${repo_version}/${repo_distro}/${osver}/\$basearch",
         }
       }
       
