@@ -12,7 +12,7 @@ describe 'varnish::selector', :type => :define do
       osfamily: 'Debian',
       puppetversion: Puppet.version,
       selinux: false,
-      service_provider: 'systemd',
+      init_system: 'systemd',
     }
   end
   let(:pre_condition) do
