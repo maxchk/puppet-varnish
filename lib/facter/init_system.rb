@@ -15,8 +15,10 @@ Facter.add(:init_system) do
           pkg_exec = Facter::Core::Execution::exec("dpkg-query -S #{path_exec}").split(' ')[0]
         when 'RedHat'
           pkg_exec = Facter::Core::Execution::exec("rpm -qf #{path_exec}").split('-')[0]
+        else
+          pkg_exec = 'unknown'
         end
-        pkg_exec.downcase[/systemd|upstart|init/]
+        pkg_exec.downcase[/systemd|upstart|init|unknown/]
       end
     end
   end
