@@ -9,7 +9,7 @@ class varnish::params {
       $default_version = '3.0'
       $add_repo = true
       $vcl_reload_script = '/usr/sbin/varnish_reload_vcl'
-      if ($::service_provider == 'systemd') {
+      if ($::init_system == 'systemd') {
         $systemd = true
         $systemd_conf_path = '/usr/lib/systemd/system/varnish.service'
         $systemd_ncsa_conf_path = undef
@@ -26,7 +26,7 @@ class varnish::params {
     }
     'Debian': {
       $vcl_reload_script = '/usr/share/varnish/reload-vcl'
-      if ($::service_provider == 'systemd' or
+      if ($::init_system == 'systemd' or
           ($::operatingsystem == 'Ubuntu' and
           versioncmp($::operatingsystemmajrelease, '15.10') > 0)) {
         $systemd = true
