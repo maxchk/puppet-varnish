@@ -181,6 +181,9 @@ sub vcl_backend_response {
 <%- if @functions['vcl_backend_response'] -%>
   <%= @functions.delete('vcl_backend_response') %>
 <%- else -%>
+  <%- if @functions['vcl_beresp_prepend'] -%>
+    <%= @functions.delete('vcl_beresp_prepend') %>
+  <%- end -%>
 <%- if @defaultgrace -%>
   # Default grace period
   set bereq.grace = <%= @defaultgrace %>;
@@ -222,6 +225,9 @@ sub vcl_backend_response {
   }
   <%- if @honor_backend_ttl -%>
   }
+  <%- end -%>
+  <%- if @functions['vcl_beresp_append'] -%>
+    <%= @functions.delete('vcl_beresp_append') %>
   <%- end -%>
 <%- end -%>
 }
