@@ -20,6 +20,9 @@
 #                 '4.0' and '4.1')
 # add_repo      - if set to false (defaults to true), the yum/apt repo is not added
 #
+# package_name  - the name of the package that should be installed
+#                 default value: varnish
+#
 # === Default values
 # Set to Varnish default values
 # With an exception to
@@ -75,6 +78,7 @@ class varnish (
   $varnish_conf_template        = 'varnish/varnish-conf.erb',
   $varnish_identity             = undef,
   $varnish_name                 = undef,
+  $package_name                 = 'varnish',
   $additional_parameters        = {},
   $additional_storages          = {},
   $conf_file_path               = $varnish::params::conf_file_path,
