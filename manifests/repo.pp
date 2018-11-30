@@ -65,6 +65,9 @@ class varnish::repo (
             '52': {
               $key_id = '91CFD5635A1A5FAC0662BEDD2E9BA3FE86BE909D'
             }
+            '60': {
+              $key_id = '7C5B46721AF00FD57E68E6E8D2605BF74E8B9DBA'
+            }
             default: {
               fail("Repo version ${repo_version} not supported")
             }
