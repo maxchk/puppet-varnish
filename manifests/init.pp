@@ -158,6 +158,9 @@ class varnish (
   file { 'storage-dir':
     ensure  => directory,
     path    => $varnish_storage_dir,
+    owner   => $varnish_user,
+    group   => $varnish_group,
+    mode    => '0755',
     require => Package['varnish'],
   }
 }
